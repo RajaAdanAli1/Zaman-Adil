@@ -1,0 +1,11 @@
+{
+  "name": "zamanadil",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "node scripts/dev.mjs",
+    "start": "npm start --prefix server",
+    "build": "npm run build --prefix client",
+    "audit": "npm audit --prefix server && npm audit --prefix client"
+  }
+}
