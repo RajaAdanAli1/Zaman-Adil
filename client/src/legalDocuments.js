@@ -1,147 +1,377 @@
 export const ISSUED = "4 November 2026";
 
+export const PROPRIETOR = {
+  name: "Dr. Adil Zaman",
+  role: "Political Scientist and Researcher",
+  department: "Department of Political Science and International Relations",
+  institution: "University of Gujrat",
+  campus: "Hafiz Hayat Campus, Gujrat, Pakistan",
+  email: "adil.zaman@uog.edu.pk",
+  site: "zamanadil.com",
+  url: "https://zamanadil.com",
+};
+
 export const instruments = {
   privacy: {
     ref: "ZA-PP-2026-01",
+    version: "1.0",
     file: "/documents/privacy-notice.pdf",
     title: "Privacy Notice",
-    description: "How Dr. Adil Zaman handles enquiries and visit counts on zamanadil.com.",
+    description:
+      "How personal information is collected, used, kept, and disclosed on zamanadil.com, and how to ask for access or deletion.",
+    standing: "Public notice. An enquiry under it is confidential.",
+    preamble: [
+      "This Privacy Notice is the public statement of how personal information is handled on zamanadil.com. It names the person responsible, the information the site actually collects, the purpose of each use, who receives it, how long it is kept, and how a reader may ask for it to be corrected or deleted.",
+      "The clause numbers are part of the instrument, so that a request can refer to a particular clause. Headings are for ease of reference and do not change the meaning of the clause beneath them.",
+    ],
     sections: [
       {
-        heading: "1. Who is responsible",
-        paragraphs: [
-          "This notice is issued by Dr. Adil Zaman, political scientist at the Department of Political Science and International Relations, University of Gujrat, in his personal professional capacity as proprietor of zamanadil.com.",
-          "The University of Gujrat is his academic affiliation. It does not operate this website and is not the recipient of messages sent through the contact form. Correspondence on this site is addressed to Dr. Adil Zaman.",
+        heading: "The person responsible",
+        clauses: [
+          "This notice is issued by Dr. Adil Zaman, political scientist, in his personal professional capacity as proprietor of zamanadil.com.",
+          "His academic affiliation is the Department of Political Science and International Relations, University of Gujrat, Hafiz Hayat Campus, Gujrat, Pakistan. The University is his academic home. It does not operate this website, it is not the person responsible for this notice, and a message sent through the contact form is not delivered to the University by this site.",
+          "A request under this notice may be sent through the contact form, with the subject marked Privacy, or by email to adil.zaman@uog.edu.pk. Where the request concerns an earlier enquiry, it should give the name and email address used in that enquiry.",
+          "The website to which this notice applies is https://zamanadil.com.",
         ],
       },
       {
-        heading: "2. Confidential professional correspondence",
-        paragraphs: [
-          "An enquiry sent through the contact form is treated as confidential professional correspondence. It is read in order to reply. It is not published on the website, added to a mailing list, sold, or shared for advertising.",
-          "Access to stored enquiries is limited to the private archive desk, which is available only to the proprietor after sign-in. A copy is also delivered to the proprietor's professional inbox so the message can be answered if the desk is not open.",
+        heading: "Scope",
+        clauses: [
+          "This notice applies to a person who visits the public pages, chooses a reading language, requests a live translation, or sends an enquiry through the contact form.",
+          "It does not apply to a journal, a publisher, a DOI resolver, or any other website opened from a link on a publication record. Those sites have their own notices.",
+          "The private archive desk is the proprietor's own sign-in for reading stored enquiries. It is not a service offered to readers, and this notice does not invite anyone else to sign in to it.",
         ],
       },
       {
-        heading: "3. What the contact form collects",
-        paragraphs: [
-          "If you choose to write, the form collects your name, email address, the nature of the enquiry, the subject, and the message. Institution and country are optional. You are asked to confirm that the enquiry may be stored so it can be read and answered.",
-          "The site also keeps a one-way hash of the connection address with the message. The hash cannot be turned back into the address. It is used only to limit repeated automated submissions. It is not used to identify you for any other purpose.",
+        heading: "The rules applied",
+        clauses: [
+          {
+            text: "Whether or not a particular statute requires a notice in this form, the proprietor applies the following rules to the site.",
+            items: [
+              "Only the information described in this notice is collected.",
+              "It is used only for the purpose stated for that information.",
+              "It is kept only for so long as that purpose, or a legal duty, requires.",
+              "It is not sold, and it is not used to build an advertising profile.",
+              "Access to an enquiry is limited to the proprietor and to the services named in section 9, and only for the purpose named there.",
+            ],
+          },
+          "Where the EU General Data Protection Regulation or the UK GDPR applies to a reader's information, the purpose stated in each section is also the basis relied on, in the language of those laws: a reply the reader has asked for; consent, where the contact form asks for it; or the proprietor's legitimate interest in keeping the form secure and in knowing which of his own pages are read, where that interest is not overridden by the reader's interests. No automated decision producing a legal or similarly significant effect is made.",
         ],
       },
       {
-        heading: "4. Email delivery",
-        paragraphs: [
-          "A copy of the enquiry is transmitted to the proprietor's inbox through an email delivery service. That transmission contains the same fields you submitted. The delivery service processes the message only to carry it. It is not authorised to use the message for its own marketing.",
+        heading: "The contact form",
+        clauses: [
+          {
+            text: "The form is used only if a reader chooses to send an enquiry. It collects the following.",
+            items: [
+              "Name.",
+              "Email address.",
+              "Institution or organisation, if the reader gives one.",
+              "Country, if the reader gives one.",
+              "The nature of the enquiry, chosen from a fixed list.",
+              "The subject and the message.",
+              "The reader's confirmation that the enquiry may be stored so that it can be read and answered.",
+            ],
+          },
+          "A one-way cryptographic hash of the connection address is stored with the enquiry. The hash is produced with a salt held by the site. It cannot be turned back into the address. It is used only to limit repeated automated submissions and to investigate abuse of the form. It is not used to identify the reader for any other purpose.",
+          "A field that the reader is not asked to complete is present so that automated submissions can be discarded. A submission that fills that field is not stored and is not emailed.",
+          "The purpose is to read the enquiry, to reply, and to keep a proper record of the professional exchange. The confirmation in clause 4.1(g) is the consent for that storage. Consent may be withdrawn by a request under section 13. Withdrawal does not undo a reply already sent. An enquiry that must be kept to answer a complaint, to establish or defend a claim, or to meet a legal duty may be kept until that matter ends.",
+          "The enquiry is treated as confidential professional correspondence. It is not published on the website, added to a mailing list, or shared for advertising.",
         ],
       },
       {
-        heading: "5. Visit counts",
-        paragraphs: [
-          "The site keeps a first-party count of page visits: the path of the page and the calendar day. These counts contain no name, no email address, and no advertising identifier. No third-party analytics service is installed.",
+        heading: "Page counts",
+        clauses: [
+          "The site keeps a first-party tally of visits: the path of a public page, the calendar day, and the number of visits. The tally contains no name, no email address, and no advertising identifier.",
+          "A hash of the kind described in clause 4.2 is used, in the server's memory and only for a short rate-limit window, to stop one connection from inflating the tally. That hash is not written into the tally.",
+          "No third-party analytics service is installed. The tally exists so the proprietor can see which of his own pages are read.",
         ],
       },
       {
-        heading: "6. Cookies and storage in the browser",
-        paragraphs: [
-          "The public pages do not set an advertising or tracking cookie. A session cookie is set only after a successful sign-in to the private archive desk. That cookie is HttpOnly and SameSite=Lax, is marked Secure on the public HTTPS site, and expires after twelve hours. It is used solely to keep the desk signed in.",
-          "If you choose a reading language on a publication, research review, or opinion page, that choice is stored in this browser so the same language can be used again. It is not sent to an advertising network.",
+        heading: "Reading language and live translation",
+        clauses: [
+          "If a reader chooses a reading language on a publication, a research review, or an opinion page, the choice is stored in that browser so the same language can be used again. It is not sent to an advertising network.",
+          "If a live translation is then requested, the reader's browser sends the published passage and the language pair to this site. This site's server sends that passage and language pair to MyMemory, a translation service operated by Translated at https://mymemory.translated.net, solely to obtain the translation. The reader's name, email address, and enquiry are not sent for this purpose. The published text remains the text of record.",
+          "MyMemory processes the passage under its own terms and privacy notice. A live translation is an aid to reading. It is not a certified translation. That limit is restated in the Academic and Editorial Disclaimer.",
         ],
       },
       {
-        heading: "7. How long enquiries are kept",
-        paragraphs: [
-          "An enquiry is kept for as long as it is needed to read, answer, and keep a proper record of the professional exchange. You may ask for the enquiry to be deleted by writing through the contact form or to adil.zaman@uog.edu.pk, and stating the name and email address used in the original message. A message that must be retained to answer a complaint or to meet a legal duty may be kept until that duty ends.",
+        heading: "Cookies, browser storage, and typefaces",
+        clauses: [
+          "The public pages do not set an advertising cookie or a tracking cookie.",
+          "A session cookie named za_session is set only after a successful sign-in to the private archive desk. It is HttpOnly and SameSite=Lax, it is marked Secure on the public HTTPS site, and it expires after twelve hours. It is used solely to keep the desk signed in. Readers are not asked to sign in, and the public pages do not set this cookie.",
+          "The reading-language choice in clause 6.1 is stored in the browser's local storage, under a key used only for that choice. Clearing the site's data in the browser removes it.",
+          "The typefaces are loaded from Google Fonts. The reader's browser requests those files from Google, which receives the connection address and the fact that a font file was requested. This site does not receive a copy of that address from Google, and it does not use Google Analytics or any Google advertising product.",
         ],
       },
       {
-        heading: "8. Links away from this site",
-        paragraphs: [
-          "Publication records may link to a journal, a DOI, or a publisher page. Those sites are not operated by Dr. Adil Zaman and have their own privacy notices.",
+        heading: "What this site does not do",
+        clauses: [
+          "The site does not sell personal information.",
+          "It does not add an enquiry to a mailing list, and it does not send a marketing message on the strength of a visit.",
+          "It does not install a third-party analytics tool or an advertising tool.",
+          "It does not ask a reader to create an account.",
+          "It does not make an automated decision that produces a legal effect, or a similarly significant effect, for a reader.",
+        ],
+      },
+      {
+        heading: "Who receives information",
+        clauses: [
+          "The proprietor reads an enquiry in the private archive desk, and in the professional inbox to which a copy is delivered.",
+          "A copy of the contact-form fields is relayed by FormSubmit, at https://formsubmit.co, to that inbox, so the enquiry can be answered if the desk is not open. FormSubmit is not authorised by this notice to use the enquiry for its own marketing. It processes the transmission under its own privacy notice.",
+          "The site is hosted by Hostinger. Stored enquiries and page-count tallies are kept in a MongoDB Atlas database. Those providers process the information as infrastructure, so that the site can operate and the enquiry can be stored. They are not authorised to use the content of an enquiry for their own purposes. A hosting provider may also keep ordinary technical logs, which can include a connection address, a requested path, and a time, for the security and operation of the host. The proprietor does not use those logs to identify readers for any other purpose.",
+          "MyMemory receives only what clause 6.2 describes, and only when a live translation is requested.",
+          "Google receives only what clause 7.4 describes, when the typeface files are loaded.",
+          "Information is otherwise disclosed only where a legal duty requires disclosure to a competent authority. An enquiry is not disclosed for any other reason.",
+        ],
+      },
+      {
+        heading: "Where information is processed",
+        clauses: [
+          "The proprietor is established in Pakistan.",
+          "Hosting, the database, FormSubmit, MyMemory, and Google Fonts may process a transmission or a stored record outside Pakistan, including in a country of the European Union, the United States, or another country in which that provider operates.",
+          "The transfer is limited to what is required to host the site, store the enquiry, deliver the email, load the typefaces, or produce a translation the reader requested. No separate transfer is made for advertising. The proprietor has not appointed a representative in the European Union or the United Kingdom. A reader in those places may write directly under clause 1.3.",
+        ],
+      },
+      {
+        heading: "How long information is kept",
+        clauses: [
+          "An enquiry is kept for as long as it is needed to read, answer, and keep a proper record of the professional exchange. It is not kept on a marketing timetable, because it is not used for marketing.",
+          "A reader may ask for the enquiry to be deleted under section 13. Clause 4.4 states the cases in which a copy may be kept until a complaint, a claim, or a legal duty has ended.",
+          "Page-count tallies are aggregate counts by path and day. They contain no name and no email address. They are kept as a record of the site's use.",
+          "A rate-limit hash held in server memory expires with the short window used to limit abuse. It is not a permanent record. The hash stored with an enquiry under clause 4.2 is kept with that enquiry, and is deleted with it.",
+          "The session cookie expires after twelve hours, or when the desk is signed out.",
+          "The reading-language choice remains in the browser until the reader clears it or chooses another language.",
+        ],
+      },
+      {
+        heading: "Security",
+        clauses: [
+          "Access to stored enquiries is limited to the proprietor, after sign-in. The session cookie cannot be read by page scripts. The public site is served over HTTPS. The connection-address hash is one-way.",
+          "No method of transmission or storage is perfectly secure. The measures in clause 12.1 are the measures actually used. A reader should not send, through the form, a password, a payment-card number, or any other secret that is not needed for the enquiry.",
+        ],
+      },
+      {
+        heading: "Requests",
+        clauses: [
+          {
+            text: "A reader may ask for any of the following.",
+            items: [
+              "To be told whether an enquiry is held, and to receive a copy of it.",
+              "To have an inaccurate enquiry corrected.",
+              "To have an enquiry deleted, subject to clause 4.4 and clause 11.2.",
+              "To withdraw the confirmation given on the contact form.",
+              "To object to a use that is not required in order to answer the enquiry.",
+              "To restrict use of an enquiry while a correction or an objection is being considered.",
+            ],
+          },
+          "The request should be sent as clause 1.3 describes. It will be answered within a reasonable time, and within one month where a law that applies to the reader requires that period.",
+          "Where the EU GDPR or the UK GDPR applies, the requests in clause 13.1 are the rights those laws give, and the reader may also complain to a supervisory authority. This notice does not take that right away. For every reader, the proprietor will receive and answer the request directly. This notice is not a certificate that a particular statute has been audited.",
+        ],
+      },
+      {
+        heading: "Children",
+        clauses: [
+          "The site is an academic profile. It is not directed at children, and the contact form should not be used to send information about a child. An enquiry that is evidently about a child, and that is not required for a professional purpose the proprietor can properly answer, will be deleted.",
+        ],
+      },
+      {
+        heading: "Links to other sites",
+        clauses: [
+          "A publication record may link to a journal, a DOI, or a publisher. Following the link leaves zamanadil.com. The proprietor does not control those pages and is not responsible for their privacy practices.",
+        ],
+      },
+      {
+        heading: "Changes to this notice",
+        clauses: [
+          "A change that affects what is collected, or why it is collected, will be published on this page with a new issue date before it takes effect, or at the time it takes effect where the change corrects an inaccuracy.",
+          "The PDF offered on this page is a copy of the text current on the issue date printed on it. If this page and the PDF differ, this page is the text in force.",
+        ],
+      },
+      {
+        heading: "Status of this notice",
+        clauses: [
+          "This notice is a public notice of the proprietor. It is not a contract for legal services, and it is not a seal or a decision of the University of Gujrat.",
+          "The Academic and Editorial Disclaimer and the Accessibility Statement are separate instruments. Each applies to its own subject. A reader who sends an enquiry is also referred to this notice by the confirmation on the contact form.",
+          "In this notice, \"enquiry\" means a message sent through the contact form, and \"proprietor\" means Dr. Adil Zaman in the capacity stated in clause 1.1. A reference to a section or a clause is a reference to this notice.",
         ],
       },
     ],
   },
   disclaimer: {
     ref: "ZA-ED-2026-01",
+    version: "1.0",
     file: "/documents/academic-disclaimer.pdf",
     title: "Academic and Editorial Disclaimer",
-    description: "The standing of research, reviews, and opinion published on zamanadil.com.",
+    description:
+      "The standing of research, reviews, opinion, translations, and described services published on zamanadil.com.",
+    standing: "Public notice. It does not create a client relationship.",
+    preamble: [
+      "This disclaimer states the standing of the material on zamanadil.com: who speaks, what a page is, what a page is not, and the care a reader should take before relying on it.",
+      "It is issued by Dr. Adil Zaman in his personal professional capacity as proprietor of the site. It is not a seal or a decision of the University of Gujrat. The clause numbers are part of the instrument. Headings are for ease of reference and do not change the meaning of the clause beneath them.",
+    ],
     sections: [
       {
-        heading: "1. Purpose of the site",
-        paragraphs: [
-          "zamanadil.com publishes the academic profile, publications, research reviews, and opinion of Dr. Adil Zaman. The material is offered for academic, educational, and general information. It is not legal advice, electoral advice, or a professional consultancy opinion delivered to a particular client.",
+        heading: "Personal capacity",
+        clauses: [
+          "Research reviews, pieces in Opinion & Blogs, and the other editorial text of this site are the work of their author. They do not state the position of the University of Gujrat, of any journal, of any political party, or of any public institution.",
+          "A publication record describes a scholarly work. The record does not, by itself, speak for the publisher or for a co-author. The version of record is the version held by the journal or the publisher.",
         ],
       },
       {
-        heading: "2. Personal capacity",
-        paragraphs: [
-          "Research reviews and pieces in Opinion & Blogs are the analysis of their author. They do not state the position of the University of Gujrat, any journal, any political party, or any public institution. A publication record describes a scholarly work; it does not, by itself, speak for the publisher or the co-authors.",
+        heading: "Purpose of the pages",
+        clauses: [
+          "The site publishes an academic profile, a list of publications, research reviews, opinion, and a description of academic services. The material is offered for academic, educational, and general information.",
+          "A page is not legal advice, electoral advice, financial advice, medical advice, or a consultancy opinion delivered to a particular client. A reader who needs advice for a decision of that kind should consult a person who is qualified, and engaged, to give it.",
         ],
       },
       {
-        heading: "3. Original sources",
-        paragraphs: [
-          "A research review discusses published scholarly work. It is not a substitute for the original paper, data, or book. Readers who need the authoritative text should use the journal, DOI, or publisher link given on the record.",
-          "Reasonable care is taken with names, dates, and links. Errors can remain. Where a decision depends on a source, the original document should be checked.",
+        heading: "Original sources",
+        clauses: [
+          "A research review discusses published scholarly work. It is not a substitute for the paper, the data, or the book. A reader who needs the authoritative text should use the journal, the DOI, or the publisher link given on the record.",
+          "Reasonable care is taken with names, dates, figures, and links. An error can remain. Where a decision depends on a source, the original document should be checked. A reader who finds an error is asked to write, through the contact form or to adil.zaman@uog.edu.pk, so that it can be corrected.",
         ],
       },
       {
-        heading: "4. Reading languages",
-        paragraphs: [
-          "Publications, research reviews, and opinion pages may offer a reading language. Where the text was not written in that language, the screen can show a live translation. The published text remains the text of record. A live translation is an aid to reading and is not a certified or official translation.",
+        heading: "Reading languages and live translation",
+        clauses: [
+          "Publications, research reviews, and opinion pages may offer a reading language. Where the text was not written in that language, the screen can show a live translation obtained as the Privacy Notice describes.",
+          "The published text is the text of record. A live translation is an aid to reading. It is not a certified, sworn, or official translation, and it can be imperfect, especially for names, legal terms, and technical terms. It should not be quoted as the author's words.",
         ],
       },
       {
-        heading: "5. External pages and third-party rights",
-        paragraphs: [
-          "Links to journals, repositories, and other websites leave zamanadil.com. Dr. Adil Zaman does not control those pages and is not responsible for their content or availability.",
+        heading: "Services and engagements",
+        clauses: [
+          "The services pages describe research design, quantitative analysis, publication support, electoral and political data research, research consultancy, and academic collaboration that Dr. Adil Zaman may undertake.",
+          "A description on the site is not a retainer, a quotation, an acceptance of instructions, or a promise that a particular engagement will be undertaken. No client relationship, consultancy relationship, or supervisory relationship arises from reading a page, from sending an enquiry, or from receiving an acknowledgement. A relationship arises only when it is agreed in writing, and it is then governed by that agreement rather than by this disclaimer.",
+          "Work of that kind, when it is agreed, is undertaken by Dr. Adil Zaman in a personal professional capacity unless the written agreement states otherwise. It is not, by that fact alone, work of the University of Gujrat.",
+        ],
+      },
+      {
+        heading: "External pages",
+        clauses: [
+          "A link to a journal, a repository, a DOI resolver, or another website leaves zamanadil.com. Dr. Adil Zaman does not control those pages and is not responsible for their content, their availability, or their privacy practices.",
+          "A link is given so that a source can be found. It is not an endorsement of every statement on the destination page.",
+        ],
+      },
+      {
+        heading: "Intellectual property",
+        clauses: [
+          "Copyright in the original text of this site remains with Dr. Adil Zaman, except where a publisher or another rightsholder holds the rights in a published work. The footer notice that all rights are reserved records that position.",
           "Titles, abstracts, and quotations from other authors remain the property of their rightsholders. They are identified so the source can be found. Nothing on this site assigns those rights to the reader.",
+          "A reader may read the site and may share a link to a page. A substantial part of the original text may not be copied for republication without the proprietor's prior written permission, except for a quotation that the applicable law already permits and that is attributed to its source.",
+          "The name and the marks of the University of Gujrat remain the University's. They appear because they state an academic affiliation. They are not licensed to the reader by this site.",
         ],
       },
       {
-        heading: "6. No warranty",
-        paragraphs: [
-          "The site is provided in good faith. It is not warranted as complete, current, or fit for a particular decision. Dr. Adil Zaman is not liable for loss arising from reliance on a review, an opinion, a link, or a live translation where the reader had the opportunity to consult the original source.",
+        heading: "Care and liability",
+        clauses: [
+          "Nothing in this disclaimer excludes or limits liability for fraud or fraudulent misrepresentation, or any liability that the law applicable to the reader does not permit to be excluded or limited.",
+          "Subject to clause 8.1, the site is published in good faith. It is not warranted as complete, current, or fit for a particular decision. To the extent the law permits, Dr. Adil Zaman is not liable for loss arising from reliance on a review, an opinion, a link, a description of services, or a live translation, where the reader could have consulted the original source or sought a written engagement under section 5.",
+        ],
+      },
+      {
+        heading: "Governing law and status",
+        clauses: [
+          "This disclaimer is governed by the laws of Pakistan. The courts of Pakistan have jurisdiction over a dispute arising from it, without prejudice to a mandatory right that the law of the reader's country does not allow to be waived, including a data-protection right described in the Privacy Notice.",
+          "This instrument is not a seal or a decision of the University of Gujrat.",
+          "In this disclaimer, \"the site\" means zamanadil.com, and \"the proprietor\" means Dr. Adil Zaman in the capacity stated in the preamble. The Privacy Notice and the Accessibility Statement are separate instruments and are not varied by this disclaimer.",
         ],
       },
     ],
   },
   accessibility: {
     ref: "ZA-AC-2026-01",
+    version: "1.0",
     file: "/documents/accessibility-statement.pdf",
     title: "Accessibility Statement",
-    description: "How zamanadil.com is intended to be used with a keyboard, a screen reader, and a small screen.",
+    description:
+      "The accessibility aim for zamanadil.com, the limits that are known, and how to report a barrier.",
+    standing: "Public statement. It is not an external audit certificate.",
+    preamble: [
+      "This statement records how zamanadil.com is intended to be used, the standard it aims at, the limits the proprietor knows about, and how a reader can report a barrier.",
+      "It is a statement by Dr. Adil Zaman, proprietor of the site. It is not a certificate from an outside auditor, and it is not a seal or a decision of the University of Gujrat. The clause numbers are part of the instrument. Headings are for ease of reference and do not change the meaning of the clause beneath them.",
+    ],
     sections: [
       {
-        heading: "1. Aim",
-        paragraphs: [
-          "Dr. Adil Zaman intends zamanadil.com to be readable and usable by the widest practical range of readers, including people who use a keyboard, a screen reader, browser zoom, or a phone. The aim is the level described by the Web Content Accessibility Guidelines 2.2 at AA, for the pages this site itself publishes. This statement is not a certificate from an outside auditor.",
+        heading: "Scope",
+        clauses: [
+          "This statement covers the public pages published by zamanadil.com, including the profile, publications, research reviews, opinion, services, contact, search, and these legal pages.",
+          "It does not cover a journal site, a publisher PDF, or a DOI page opened from a publication record. Those are published by someone else. A reader who cannot use the outside page can still use the citation on this site to request the source another way. The link itself is covered by the Academic and Editorial Disclaimer.",
         ],
       },
       {
-        heading: "2. What is provided",
-        paragraphs: [
-          "Each public page has a skip link to the main content, one main heading, and headings in a logical order. Links, buttons, and form fields show a visible focus style. Form fields are labelled, and links use meaningful text. Images that carry meaning have a text alternative. Body text and navigation are set for readable contrast. Animation follows the system setting for reduced motion.",
-          "The contact form can be completed with a keyboard. Errors are written on the page, not only by colour.",
+        heading: "The standard aimed at",
+        clauses: [
+          "The aim, for the pages this site itself publishes, is Level AA of the Web Content Accessibility Guidelines 2.2.",
+          "Those guidelines are the technical standard used here. This statement does not claim that an external audit has certified conformance, and it does not claim a statutory badge.",
         ],
       },
       {
-        heading: "3. Reading language",
-        paragraphs: [
-          "A reading-language control is provided on publications, research reviews, and opinion pages, including the individual record. It is not shown on the other pages of the site. The choice is kept in this browser. Where a live translation is shown, the published text remains available as the text of record.",
+        heading: "Conformance",
+        clauses: [
+          "The public pages are partially conformant with WCAG 2.2 Level AA. Partially conformant means that some parts do not yet fully conform, for the reasons in section 6 and section 7.",
+          "The measures in section 4 are in place across the templates this site uses. A newly added record is prepared in those templates. An older record may be shorter, as section 6 states.",
         ],
       },
       {
-        heading: "4. Known limits",
-        paragraphs: [
-          "A journal, DOI, or PDF opened from a publication record is published by someone else. Its accessibility is outside this site. A live translation can be imperfect, especially for names and technical terms. Some older records may have a short summary rather than a full text.",
+        heading: "Measures in place",
+        clauses: [
+          "Each public page has a skip link to the main content, one main heading, and further headings in a logical order. The language of the page is identified. A passage in Urdu is marked so that a screen reader can treat it as Urdu.",
+          "Links, buttons, and form fields show a visible focus style. Controls can be reached and operated with a keyboard. The contact form can be completed and submitted with a keyboard. An error is written on the page, and is not conveyed by colour alone.",
+          "Form fields have visible labels. Links use text that says where they go. An image that carries meaning has a text alternative. An image that is decorative is hidden from assistive technology.",
+          "Body text and navigation are set for readable contrast. These legal instruments are set as dark text on a light sheet for the same reason. Text can be resized with the browser, and the layout is usable on a small screen.",
+          "Animation follows the reader's system setting for reduced motion.",
+          "The site does not load a third-party analytics script or an advertising frame.",
         ],
       },
       {
-        heading: "5. Reporting a barrier",
-        paragraphs: [
-          "If a page on zamanadil.com blocks you, write through the contact form or to adil.zaman@uog.edu.pk. Please name the page and describe what you were trying to do. The message is read as confidential professional correspondence under the Privacy Notice. A barrier that can be corrected in this site will be corrected within a reasonable time.",
+        heading: "Reading language",
+        clauses: [
+          "A reading-language control is provided on publications, research reviews, and opinion pages, including the individual record. It is not shown on the other pages of the site, which are published in English.",
+          "The choice is kept in the browser, as the Privacy Notice describes. Where a live translation is shown, the published text remains available as the text of record. A live translation can be imperfect, especially for a name or a technical term, and a reader should not have to depend on it for those.",
+        ],
+      },
+      {
+        heading: "Known limits",
+        clauses: [
+          "Some older records may carry a short summary rather than a full text. The summary is the text available on this site. The full text, where it exists, is the version at the journal or the publisher.",
+          "A live translation is produced by an external service when the reader asks for it. It is not reviewed line by line before it is shown. The published text remains on the page as the text of record.",
+          "A PDF of each of these three instruments is offered for download. The PDF is a secondary copy for printing and filing. It carries a document title and page numbers. It is not the accessible version. The page itself is the version to use with a screen reader, with browser zoom, or with a keyboard.",
+        ],
+      },
+      {
+        heading: "Content published by others",
+        clauses: [
+          "A journal article, a publisher PDF, or a DOI page is outside this statement. The publication record on this site still gives the citation, so the source can be requested by another route if the outside page is itself a barrier.",
+        ],
+      },
+      {
+        heading: "How to report a barrier",
+        clauses: [
+          "If a page on zamanadil.com blocks a reader, the reader is asked to write through the contact form, or to adil.zaman@uog.edu.pk, with the subject marked Accessibility.",
+          "The message should name the page, the browser or assistive technology if it is known, and what the reader was trying to do. The message is read as confidential professional correspondence under the Privacy Notice.",
+        ],
+      },
+      {
+        heading: "What will be done",
+        clauses: [
+          "A barrier that can be corrected in this site will be corrected within a reasonable time. Where a reply address was given, the reader who reported it will be told what will be done, or why a particular limit remains.",
+        ],
+      },
+      {
+        heading: "How this statement was prepared",
+        clauses: [
+          "This statement was prepared on 4 November 2026 by Dr. Adil Zaman, from the templates and the pages then published. It was not prepared by an external auditor.",
+          "It will be reviewed within twelve months, and sooner if a material change is made to the templates. The issue date on this page will be changed when the statement is reviewed and reissued.",
+        ],
+      },
+      {
+        heading: "Complaints",
+        clauses: [
+          "This is a personal academic website. It is not a public-sector body, and no statutory accessibility monitor is designated for it by this statement.",
+          "The route offered here is the report described in section 8. A reader who has a separate legal right is not prevented from using it. Nothing in this statement takes that right away, and nothing in it is a seal or a decision of the University of Gujrat.",
+          "In this statement, \"the site\" means zamanadil.com, and \"the proprietor\" means Dr. Adil Zaman. The Privacy Notice and the Academic and Editorial Disclaimer are separate instruments.",
         ],
       },
     ],

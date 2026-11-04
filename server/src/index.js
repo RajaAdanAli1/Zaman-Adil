@@ -5,7 +5,7 @@ import path from "node:path";
 import { pathToFileURL, fileURLToPath } from "node:url";
 import { createApp } from "./app.js";
 import { assertRuntimeConfig } from "./auth.js";
-import { connectDatabase, disconnectDatabase } from "./db.js";
+import { connectDatabase, disconnectDatabase, markDatabaseReady } from "./db.js";
 import { clientIndex, repoRoot } from "./paths.js";
 import { publicError } from "./redact.js";
 import { seedIfEmpty } from "./seed.js";
@@ -140,20 +140,21 @@ export async function start() {
   const { port, host } = listenConfig();
   ensureClientBuild();
   assertProductionBuild();
-  try {
-    await connectDatabase();
-    await seedIfEmpty();
-  } catch (error) {
-    await disconnectDatabase().catch(() => {});
-    throw error;
-  }
-
   const app = createApp();
   const server = await listen(app, port, host);
   server.keepAliveTimeout = 65000;
   server.headersTimeout = 66000;
   console.log(`Listening on ${host}:${port}`);
   bindShutdown(server);
+  try {
+    await connectDatabase();
+    await seedIfEmpty();
+    markDatabaseReady();
+  } catch (error) {
+    await disconnectDatabase().catch(() => {});
+    server.close();
+    throw error;
+  }
   return server;
 }
 

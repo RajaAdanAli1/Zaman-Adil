@@ -1,6 +1,15 @@
 import mongoose from "mongoose";
 
 let memoryServer;
+let ready = false;
+
+export function databaseReady() {
+  return ready;
+}
+
+export function markDatabaseReady() {
+  ready = true;
+}
 
 const LOCAL_URI = "mongodb://127.0.0.1:27017/zamanadil";
 
@@ -92,6 +101,7 @@ export async function connectDatabase() {
 }
 
 export async function disconnectDatabase() {
+  ready = false;
   await mongoose.disconnect();
   if (memoryServer) {
     await memoryServer.stop();

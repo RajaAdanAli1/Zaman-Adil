@@ -8,7 +8,7 @@ import { ReadingBar } from "../components/ReadingBar";
 import { selectEdition, textLang, typeLabel } from "../../../shared/reading.js";
 import { LiveText } from "../components/LiveText";
 import { useReading } from "../reading";
-import { ISSUED, instruments } from "../legalDocuments";
+import { ISSUED, PROPRIETOR, instruments } from "../legalDocuments";
 
 export function About() {
   usePage("About", "Dr. Adil Zaman is a political scientist, researcher and academic specialising in elections, political behaviour, democratic institutions and South Asian politics.");
@@ -231,7 +231,7 @@ export function Contact() {
             <label className="field full">Message<textarea required value={form.message} onChange={set("message")} /></label>
             <label className="check full">
               <input type="checkbox" required checked={form.consent} onChange={set("consent")} />
-              <span>I agree that this enquiry may be stored so it can be read and answered, as described in the <Link to="/privacy">Privacy Policy</Link>.</span>
+              <span>I agree that this enquiry may be stored so it can be read and answered, as described in the <Link to="/privacy">Privacy Notice</Link>.</span>
             </label>
           </div>
           <button className="btn solid" type="submit" disabled={busy}>{busy ? "Sending…" : "Send Message"}</button>
@@ -314,53 +314,107 @@ export function SearchPage() {
   );
 }
 
+function LinkedText({ text }) {
+  const parts = String(text).split(/(https:\/\/[^\s)]+|adil\.zaman@uog\.edu\.pk)/g);
+  return parts.map((part, index) => {
+    if (!part) return null;
+    if (part.startsWith("https://")) {
+      const clean = part.replace(/[.,;:]$/, "");
+      const tail = part.slice(clean.length);
+      return <span key={index}><a href={clean}>{clean}</a>{tail}</span>;
+    }
+    if (part.includes("@")) return <a key={index} href={`mailto:${part}`}>{part}</a>;
+    return <span key={index}>{part}</span>;
+  });
+}
+
 export function Legal({ kind }) {
   const doc = instruments[kind];
   usePage(doc.title, doc.description);
   const others = [
     ["/privacy", "Privacy Notice"],
-    ["/disclaimer", "Disclaimer"],
+    ["/disclaimer", "Academic and Editorial Disclaimer"],
     ["/accessibility", "Accessibility Statement"],
   ].filter(([href]) => href !== `/${kind}`);
   return (
-    <article>
+    <article className="legal-page">
       <header className="page-hero scene is-ready" data-scene="letters">
         <div className="frame">
-          <p className="eyebrow"><span>Legal instrument</span></p>
+          <p className="eyebrow"><span>Public instrument</span></p>
           <h1>{doc.title}</h1>
           <p className="lede">{doc.description}</p>
         </div>
       </header>
       <div className="frame page-pad">
-        <article className="deed" aria-labelledby="deed-title">
+        <article className="deed" lang="en" aria-labelledby="deed-title">
           <header className="deed-head">
-            <p className="deed-kicker">zamanadil.com</p>
-            <p id="deed-title">{doc.title}</p>
-            <p>Dr. Adil Zaman</p>
-            <p>Department of Political Science and International Relations</p>
-            <p>University of Gujrat, Pakistan</p>
+            <div className="deed-id">
+              <img className="deed-seal" src="/media/logo.jpg" alt="" width="64" height="64" />
+              <div>
+                <p className="deed-kicker">{PROPRIETOR.site}</p>
+                <p id="deed-title" className="deed-title">{doc.title}</p>
+                <p className="deed-party">{PROPRIETOR.name}</p>
+                <p className="deed-affil">{PROPRIETOR.department}<br />{PROPRIETOR.institution}<br />{PROPRIETOR.campus}</p>
+              </div>
+            </div>
             <dl className="deed-meta">
               <div><dt>Document</dt><dd>{doc.ref}</dd></div>
+              <div><dt>Version</dt><dd>{doc.version}</dd></div>
               <div><dt>Issued</dt><dd>{ISSUED}</dd></div>
               <div><dt>Status</dt><dd>In force</dd></div>
-              <div><dt>Standing</dt><dd>Public notice. Correspondence under it is confidential.</dd></div>
+              <div><dt>Standing</dt><dd>{doc.standing}</dd></div>
+              <div><dt>Correspondence</dt><dd><a href={`mailto:${PROPRIETOR.email}`}>{PROPRIETOR.email}</a></dd></div>
             </dl>
-            <p className="deed-download"><a className="btn line" href={doc.file}>Download PDF</a></p>
+            <div className="deed-actions">
+              <a className="btn line" href={doc.file}>Download PDF</a>
+              <p className="deed-note">The PDF is a copy for printing and filing. If this page and the PDF differ, this page is the text in force.</p>
+            </div>
           </header>
-          {doc.sections.map((section) => (
-            <section key={section.heading}>
-              <h2>{section.heading}</h2>
-              {section.paragraphs.map((paragraph) => <p key={paragraph}>{paragraph}</p>)}
-            </section>
-          ))}
+          <div className="deed-preamble">
+            {doc.preamble.map((paragraph) => <p key={paragraph}><LinkedText text={paragraph} /></p>)}
+          </div>
+          {doc.sections.map((section, sectionIndex) => {
+            const article = sectionIndex + 1;
+            return (
+              <section key={section.heading} aria-labelledby={`art-${article}`}>
+                <h2 id={`art-${article}`}>{article}. {section.heading}</h2>
+                <ol className="clauses">
+                  {section.clauses.map((clause, clauseIndex) => {
+                    const body = typeof clause === "string" ? { text: clause } : clause;
+                    const number = `${article}.${clauseIndex + 1}`;
+                    return (
+                      <li key={number} id={`c-${number}`}>
+                        <span className="clause-no">{number}</span>
+                        <div>
+                          <p><LinkedText text={body.text} /></p>
+                          {body.items && (
+                            <ol className="clause-items">
+                              {body.items.map((item, itemIndex) => (
+                                <li key={`${number}-${itemIndex}`}>
+                                  <span>({String.fromCharCode(97 + itemIndex)})</span>
+                                  <span><LinkedText text={item} /></span>
+                                </li>
+                              ))}
+                            </ol>
+                          )}
+                        </div>
+                      </li>
+                    );
+                  })}
+                </ol>
+              </section>
+            );
+          })}
           <footer className="deed-sign">
             <h2>Attestation</h2>
-            <p className="sign-name">Dr. Adil Zaman</p>
-            <p>Political Scientist and Researcher</p>
-            <p>Proprietor of zamanadil.com</p>
-            <p>Attested on {ISSUED} in a personal professional capacity. This instrument is not a seal or decision of the University of Gujrat.</p>
+            <p className="sign-name">{PROPRIETOR.name}</p>
+            <p>{PROPRIETOR.role}</p>
+            <p>Proprietor of {PROPRIETOR.site}</p>
+            <p>Attested on {ISSUED} in a personal professional capacity. This instrument is not a seal or a decision of the {PROPRIETOR.institution}.</p>
+            <p className="deed-end">End of document {doc.ref}.</p>
           </footer>
           <nav className="deed-related" aria-label="Related instruments">
+            <p>Related instruments</p>
             {others.map(([href, label]) => <Link key={href} to={href}>{label}</Link>)}
           </nav>
         </article>

@@ -4,6 +4,7 @@ import fs from "node:fs";
 import path from "node:path";
 import publicRoutes from "./routes/public.js";
 import adminRoutes from "./routes/admin.js";
+import { databaseReady } from "./db.js";
 import { clientDist, clientIndex } from "./paths.js";
 import { publicError } from "./redact.js";
 import { ORIGIN } from "../../shared/seo.js";
@@ -60,7 +61,10 @@ export function createApp() {
     next();
   });
 
-  app.get("/api/health", (_req, res) => res.json({ ok: true }));
+  app.get("/api/health", (_req, res) => {
+    if (!databaseReady()) return res.status(503).json({ ok: false });
+    res.json({ ok: true });
+  });
   app.use("/api/admin", adminRoutes);
   app.use("/api", publicRoutes);
   app.use("/api", (_req, res) => res.status(404).json({ error: "Not found." }));

@@ -12,6 +12,8 @@ export const PROFILE = {
   name: "Dr. Adil Zaman",
   jobTitle: "Political Scientist",
   email: "adil.zaman@uog.edu.pk",
+  telephone: "+92-53-2260000",
+  telephoneExtension: "5062",
   affiliation: "University of Gujrat",
   affiliationUrl: "https://uog.edu.pk",
   department: "Department of Political Science and International Relations",
@@ -74,16 +76,19 @@ export const PAGES = {
       "Contact Dr. Adil Zaman about academic collaboration, research consultancy, invited lectures, research projects and publication enquiries.",
   },
   "/privacy": {
-    title: "Privacy Policy",
-    description: "How zamanadil.com handles contact enquiries and first-party page counts.",
+    title: "Privacy Notice",
+    description:
+      "How personal information is collected, used, kept, and disclosed on zamanadil.com, and how to ask for access or deletion.",
   },
   "/disclaimer": {
     title: "Academic and Editorial Disclaimer",
-    description: "Academic and editorial disclaimer for material published on zamanadil.com.",
+    description:
+      "The standing of research, reviews, opinion, translations, and described services published on zamanadil.com.",
   },
   "/accessibility": {
-    title: "Accessibility",
-    description: "Accessibility commitments for zamanadil.com.",
+    title: "Accessibility Statement",
+    description:
+      "The accessibility aim for zamanadil.com, the limits that are known, and how to report a barrier.",
   },
   "/terms": {
     title: "Terms",
@@ -205,6 +210,7 @@ function organizationNode() {
     url: `${ORIGIN}/`,
     description: PROFILE.description,
     email: PROFILE.email,
+    telephone: `${PROFILE.telephone};ext=${PROFILE.telephoneExtension}`,
     logo: {
       "@type": "ImageObject",
       url: absoluteUrl("/media/logo.jpg"),
@@ -221,6 +227,7 @@ function organizationNode() {
       "@type": "ContactPoint",
       contactType: "academic enquiries",
       email: PROFILE.email,
+      telephone: `${PROFILE.telephone};ext=${PROFILE.telephoneExtension}`,
       url: `${ORIGIN}/contact`,
       availableLanguage: ["English", "Urdu"],
     },
