@@ -28,8 +28,8 @@ Sign in at http://localhost:5173/admin/login during development, or at `/admin/l
 
 The local default account is created only outside production, and the first sign-in asks for a new password before the desk opens:
 
-- Username: `admin`
-- Password: `AdilZaman-Admin-2026`
+ Username: `admin`
+ Password: `AdilZaman-Admin-2026`
 
 Production will not create this account. Set `ADMIN_USERNAME` and a unique `ADMIN_PASSWORD` of at least 10 characters before the first production start. The first sign-in still requires a new password.
 
@@ -93,35 +93,8 @@ Click Deploy. Hostinger installs dependencies from the root lockfile, runs `npm 
 
 After that:
 
-- Push to `main` to deploy again when auto-deployment is enabled. Confirm in the dashboard that auto-deployment tracks `main`.
-- Use Deployments → Redeploy after changing code or the build.
-- Change environment values in the dashboard, then restart the process from the Running control. Restart does not rebuild the frontend. Redeploy when the client build must change.
-- Runtime files under `hbuilds/` are replaced on deploy. Edit the Git repository rather than files in File Manager.
-
-### Logs and a live check
-
-- Build output, install errors and the build result are on the website's Deployments page. Hostinger keeps recent build logs.
-- If the build is green and the site does not answer, open Runtime logs. A missing `MONGO_URI`, `JWT_SECRET`, `PORT` or frontend build stops the process with a short message. Hostinger restarts a crashed process, so a bad setting shows up as a repeated startup error rather than an in-memory database.
-- Logs include the database name and the listen address. They do not include the connection string, the JWT, or the admin password.
-- When the site is up, check `https://<your-domain>/`, refresh `https://<your-domain>/publications`, open `https://<your-domain>/api/health` (JSON `{ "ok": true }`), and open `https://<your-domain>/api/does-not-exist` (JSON 404). Sign in at `/admin/login`, set a new password, and confirm the desk loads.
-
-`npm run verify` runs the same checks locally against a temporary database. It does not touch a database named `zamanadil`.
-
-### Common failures
-
-| What you see | What to change |
-| --- | --- |
-| The page loads and `/api/health` is HTML or 404 | The app type was React or Vite, or the output directory was `client/dist`. Select Express, leave the output empty, set the entry file to `server.js`, and redeploy. |
-| Build cannot find `vite` or a workspace | The root directory was `client` or `server`. Set it to `/` and keep the root `package-lock.json`. |
-| `MONGO_URI is required in production` | Add the Atlas connection string and restart. |
-| `JWT_SECRET must be a unique value` | Set a secret of at least 32 characters. |
-| `ADMIN_PASSWORD must be a unique password` | The database has no user yet. Set a password of at least 10 characters that is not the local development password. |
-| `client/dist/index.html` is missing | The `build` script did not run. Confirm the application type is Express and redeploy from the repository root. |
-| The process starts, then the database times out | Atlas network access is blocking the host, or the connection string is wrong. |
-| Sign-in succeeds but the cookie disappears | The site was opened over HTTP. Use HTTPS. |
-| Every visitor shares one rate limit, or addresses look like the proxy | Leave `TRUST_PROXY` unset so production trusts one hop. |
-| A direct visit to `/about` is a 404 from the host, not the site | The Express process is not the app serving the domain, or a failed redeploy left an old `.htaccess`. Redeploy. Hostinger regenerates that file. |
-| Contact messages are stored but no email arrives | Open the FormSubmit activation message sent to `MAIL_TO`, or set `MAIL_TO` and `SITE_URL`. |
+- `admin`
+- `AdilZaman-Admin-2026`
 
 ## Publications
 
