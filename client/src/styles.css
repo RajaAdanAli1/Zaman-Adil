@@ -1835,6 +1835,22 @@ td, th { overflow-wrap: break-word; }
 @media (pointer: coarse) {
   .btn.small, .filters button, .filters a, .desk-tools button { min-height: 2.75rem; }
 }
+.server-fallback {
+  max-width: var(--measure);
+  margin: 0 auto;
+  padding: 2.5rem 1.25rem 4rem;
+}
+.server-fallback nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem 1rem;
+  margin-bottom: 1.5rem;
+}
+.server-fallback h1 { font-size: clamp(2rem, 1.2rem + 2.4vw, 3.2rem); margin: 0 0 0.8rem; }
+.server-fallback h2 { font-size: 1.45rem; margin: 1.6rem 0 0.45rem; }
+.server-fallback h3 { margin: 1rem 0 0.2rem; }
+.server-fallback p { margin: 0.45rem 0; }
+.server-fallback ul { margin: 0.4rem 0 0.8rem; padding-left: 1.2rem; }
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
   *, *::before, *::after {

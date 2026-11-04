@@ -1,6 +1,6 @@
 import { Article, Publication } from "./models.js";
 import { presentArticle, presentPublication } from "./present.js";
-import { areas, expertise, interests, nav, services } from "../../client/src/content.js";
+import { areas, expertise, homeServices, interests, nav, services } from "../../client/src/content.js";
 import {
   ORIGIN,
   PAGES,
@@ -213,15 +213,26 @@ async function homeDocument() {
   };
   const main = [
     `<h1>${escapeHtml(PROFILE.name)}</h1>`,
-    `<p>${escapeHtml("Political scientist at the University of Gujrat. Researching elections, political behaviour, democratic institutions and the changing politics of Pakistan and South Asia.")}</p>`,
+    `<p>${escapeHtml("Dr. Adil Zaman is a Political Scientist and Researcher at the University of Gujrat. He researches elections, political behaviour, democratic institutions and the changing politics of Pakistan and South Asia.")}</p>`,
+    `<p>${escapeHtml("His work is empirical political research: survey analysis and comparative study of electoral processes, citizen behaviour and democratic institutions.")}</p>`,
+    ...ABOUT.map((paragraph) => `<p>${escapeHtml(paragraph)}</p>`),
     `<h2>Research areas</h2>`,
-    linkList(areas.map(([title]) => ["/expertise", title])),
+    ...areas.map(([title, text]) => `<h3>${escapeHtml(title)}</h3><p>${escapeHtml(text)}</p>`),
+    `<p><a href="/expertise">Research expertise</a></p>`,
     `<h2>Featured research</h2>`,
     linkList(data.featured.map((item) => [`/publications/${item.id}`, item.title])),
+    `<p><a href="/publications">Publications</a></p>`,
     `<h2>Research reviews</h2>`,
     linkList(data.reviews.map((item) => [`/research-reviews/${item.slug}`, item.title])),
+    `<p><a href="/research-reviews">Research reviews</a></p>`,
     `<h2>Opinion and blogs</h2>`,
     linkList(data.opinions.map((item) => [`/opinion-blogs/${item.slug}`, item.title])),
+    `<p><a href="/opinion-blogs">Opinion and blogs</a></p>`,
+    `<h2>Research and academic services</h2>`,
+    ...homeServices.map(([title, href, text]) => `<h3><a href="${escapeHtml(href)}">${escapeHtml(title)}</a></h3><p>${escapeHtml(text)}</p>`),
+    `<p>${escapeHtml(`Research interests include ${interests.join(", ")}.`)}</p>`,
+    `<p><a href="/contact">Contact</a> <a href="mailto:${escapeHtml(PROFILE.email)}">${escapeHtml(PROFILE.email)}</a></p>`,
+    `<p><a href="${escapeHtml(PROFILE.profiles[0])}">University of Gujrat faculty profile</a></p>`,
   ].join("");
   return ready({
     meta: { ...page, path: "/" },
@@ -404,7 +415,7 @@ function staticDocument(path) {
 export function applyTemplate(template, document) {
   const head = headBlock({ ...document.meta, lang: document.lang });
   const bootstrap = jsonScript(document.bootstrap || {});
-  const noscript = document.noscript ? `<noscript>${document.noscript}</noscript>` : "";
+  const fallback = document.noscript ? `<div class="server-fallback">${document.noscript}</div>` : "";
   let html = template.replace(/<html lang="[^"]*">/i, `<html lang="${document.lang === "ur" ? "ur" : "en"}">`);
   if (html.includes("<!--seo-head-->") && html.includes("<!--/seo-head-->")) {
     html = html.replace(/<!--seo-head-->[\s\S]*?<!--\/seo-head-->/, `<!--seo-head-->\n    ${head}\n    <!--/seo-head-->`);
@@ -413,8 +424,11 @@ export function applyTemplate(template, document) {
     /<script type="application\/json" id="bootstrap">[\s\S]*?<\/script>/,
     `<script type="application/json" id="bootstrap">${bootstrap}</script>`
   );
+  if (html.includes('<div id="root"></div>')) {
+    html = html.replace('<div id="root"></div>', `<div id="root">${fallback}</div>`);
+  }
   if (html.includes("<!--seo-noscript-->")) {
-    html = html.replace("<!--seo-noscript-->", noscript);
+    html = html.replace("<!--seo-noscript-->", "");
   }
   const preload = (document.preload || [])
     .map((item) => `<link rel="preload" as="${escapeHtml(item.as)}" href="${escapeHtml(item.href)}"${item.fetchpriority ? ` fetchpriority="${escapeHtml(item.fetchpriority)}"` : ""} />`)

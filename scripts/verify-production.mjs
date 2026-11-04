@@ -219,7 +219,7 @@ async function main() {
 
     const home = await fetch(`${base}/`);
     const homeHtml = await home.text();
-    check("homepage", home.status === 200 && homeHtml.includes('id="root"') && !homeHtml.includes("/src/main.jsx"));
+    check("homepage", home.status === 200 && homeHtml.includes('id="root"') && homeHtml.includes("<h1>") && !homeHtml.includes("<noscript><nav>") && !homeHtml.includes("/src/main.jsx"));
     check("security headers", ["nosniff", "DENY", "max-age=31536000"].every((token) => [...home.headers].some(([, value]) => value.includes(token))) && (home.headers.get("content-security-policy") || "").includes("default-src 'self'"));
 
     const assetPath = homeHtml.match(/\/assets\/[^"']+\.js/)?.[0];
