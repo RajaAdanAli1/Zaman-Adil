@@ -24,7 +24,7 @@ A React or Vite preset publishes static files and never starts the API, the data
 | Output directory | Empty. Delete `build` if the form filled it in. |
 | Entry file | `server.js`, when the form shows this field |
 
-`npm run build` writes the frontend to `client/dist`. Express serves that folder. An output directory of `build` or `client/dist` can drop the server from the deployment. If that folder is not present when the process starts, `server.js` runs the same build before it listens.
+`npm run build` writes the frontend to `client/dist`. Express serves that folder. An output directory of `build` or `client/dist` can drop the server from the deployment. If that folder is absent at startup, the process builds it with Node. Node.js on the host must be 22.12 or newer.
 
 If the Express preset hides the build command and the output directory, leave them hidden. Hostinger still runs the root `build` script and then starts `server.js`.
 

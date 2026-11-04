@@ -5,5 +5,4 @@ client/node_modules
 .env.local
 server/.env
 server/data
-client/dist
 npm-debug.log*

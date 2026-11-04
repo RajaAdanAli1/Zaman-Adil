@@ -39,17 +39,37 @@ export function listenConfig() {
   return { port: 5000, host };
 }
 
+function viteBinary() {
+  const candidates = [
+    path.join(repoRoot, "node_modules", "vite", "bin", "vite.js"),
+    path.join(repoRoot, "client", "node_modules", "vite", "bin", "vite.js"),
+  ];
+  return candidates.find((file) => fs.existsSync(file)) || "";
+}
+
 export function ensureClientBuild() {
   if (process.env.NODE_ENV !== "production" || fs.existsSync(clientIndex)) return;
-  console.log("Frontend build is missing. Running npm run build.");
-  const result = spawnSync("npm", ["run", "build"], {
-    cwd: repoRoot,
-    stdio: "inherit",
-    shell: true,
+  const [major, minor] = process.versions.node.split(".").map(Number);
+  const nodeOk = major > 22 || (major === 22 && minor >= 12) || (major === 20 && minor >= 19);
+  console.log(`Frontend build is missing. Node ${process.version} on ${process.platform}/${process.arch}.`);
+  if (!nodeOk) {
+    throw new Error(`Hostinger must use Node.js 22.12 or newer. This process is Node ${process.version}.`);
+  }
+  const viteBin = viteBinary();
+  if (!viteBin) {
+    throw new Error("Vite is not installed in node_modules, so the frontend cannot be built on the server.");
+  }
+  const result = spawnSync(process.execPath, [viteBin, "build"], {
+    cwd: path.join(repoRoot, "client"),
+    encoding: "utf8",
     env: process.env,
+    maxBuffer: 1024 * 1024,
   });
-  if (result.status !== 0) {
-    throw new Error("npm run build failed, so client/dist/index.html was not created.");
+  const output = [result.stdout, result.stderr].filter(Boolean).join("\n").trim();
+  if (output) console.log(output.slice(-2000));
+  if (result.error || result.status !== 0 || !fs.existsSync(clientIndex)) {
+    const reason = result.error?.message || (result.signal ? `signal ${result.signal}` : `exit ${result.status}`);
+    throw new Error(`Frontend build failed (${reason}). ${output}`.replace(/\s+/g, " ").slice(0, 350));
   }
 }
 
