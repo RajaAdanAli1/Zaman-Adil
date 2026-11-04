@@ -23,8 +23,6 @@ Sign in at http://localhost:5173/admin/login.
 
 Default username and password. The first sign-in asks for a new password before the desk opens:
 
-- `admin`
-- `AdilZaman-Admin-2026`
 
 ## Publications
 
