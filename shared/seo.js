@@ -37,7 +37,7 @@ export const PROFILE = {
 
 export const PAGES = {
   "/": {
-    title: "Dr. Adil Zaman | Political Scientist, Researcher and Academic",
+    title: "Dr. Adil Zaman | Political Scientist and Researcher",
     description: PROFILE.description,
   },
   "/about": {

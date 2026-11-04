@@ -30,7 +30,7 @@ export default function Home() {
   const reading = useReading();
   const { t } = reading;
   usePage(
-    "Dr. Adil Zaman | Political Scientist, Researcher and Academic",
+    "Dr. Adil Zaman | Political Scientist and Researcher",
     "Dr. Adil Zaman researches elections, political behaviour, democratic institutions and the changing politics of Pakistan and South Asia."
   );
   const [data, setData] = useState(() => {
