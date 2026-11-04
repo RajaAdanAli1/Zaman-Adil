@@ -60,7 +60,7 @@ Node.js Web Apps are available on Business Web Hosting and the Cloud hosting pla
 
 The Express preset hides the build script and output directory. Hostinger still runs the `build` script from the root `package.json`, then starts `server.js`. If a form instead asks for full commands, use `npm run build` and `npm start`. Both commands call the same build and the same `server.js` entry. Do not set the output directory to `client/dist`: that directory is the frontend build, and Express serves it. Selecting it as Hostinger's output can drop the server from the deployment.
 
-Node.js 22 is Hostinger's default LTS and the version to select. The installed Vite 6.4 release also accepts Node 18, Node 20 and Node 24, which Hostinger offers. The root `package.json` allows Node 20 or newer so the deployment stays on a current line.
+Node.js 22 is Hostinger's default LTS and the version to select. Use 22.12 or newer when the list shows a specific release. The root `package.json` also allows Node 20.19 or newer.
 
 ### Environment variables
 

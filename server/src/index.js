@@ -1,3 +1,4 @@
+import { spawnSync } from "node:child_process";
 import dotenv from "dotenv";
 import fs from "node:fs";
 import path from "node:path";
@@ -5,7 +6,7 @@ import { pathToFileURL, fileURLToPath } from "node:url";
 import { createApp } from "./app.js";
 import { assertRuntimeConfig } from "./auth.js";
 import { connectDatabase, disconnectDatabase } from "./db.js";
-import { clientIndex } from "./paths.js";
+import { clientIndex, repoRoot } from "./paths.js";
 import { publicError } from "./redact.js";
 import { seedIfEmpty } from "./seed.js";
 
@@ -32,16 +33,30 @@ export function listenConfig() {
   }
   if (parsed.port) return { port: parsed.port, host };
   if (process.env.NODE_ENV === "production") {
-    console.warn("PORT is empty. Listening on 3000. Delete a blank PORT row in the host panel so the platform can assign the port.");
+    console.log("PORT is not set. Listening on 3000.");
     return { port: 3000, host };
   }
   return { port: 5000, host };
 }
 
+export function ensureClientBuild() {
+  if (process.env.NODE_ENV !== "production" || fs.existsSync(clientIndex)) return;
+  console.log("Frontend build is missing. Running npm run build.");
+  const result = spawnSync("npm", ["run", "build"], {
+    cwd: repoRoot,
+    stdio: "inherit",
+    shell: true,
+    env: process.env,
+  });
+  if (result.status !== 0) {
+    throw new Error("npm run build failed, so client/dist/index.html was not created.");
+  }
+}
+
 export function assertProductionBuild() {
   if (process.env.NODE_ENV !== "production") return;
   if (!fs.existsSync(clientIndex)) {
-    throw new Error("The production frontend build is missing (client/dist/index.html). Run npm run build from the repository root before starting.");
+    throw new Error("The production frontend build is missing (client/dist/index.html).");
   }
 }
 
@@ -103,6 +118,7 @@ function bindShutdown(server) {
 export async function start() {
   assertRuntimeConfig();
   const { port, host } = listenConfig();
+  ensureClientBuild();
   assertProductionBuild();
   try {
     await connectDatabase();

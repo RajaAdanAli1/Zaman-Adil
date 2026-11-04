@@ -159,7 +159,7 @@ async function main() {
   const noPort = await runUntilExit(childEnv({ JWT_SECRET: jwt, MONGODB_URI: "mongodb://127.0.0.1:1/zamanadil_verify" }));
   check(
     "missing PORT does not crash on the port check",
-    noPort.code === 1 && noPort.out.includes("PORT is empty") && !noPort.out.includes("must be an integer"),
+    noPort.code === 1 && noPort.out.includes("PORT is not set") && !noPort.out.includes("must be an integer"),
     noPort.out.slice(0, 300),
   );
 
