@@ -3,6 +3,7 @@ export const ISSUED = "4 November 2026";
 export const instruments = {
   privacy: {
     ref: "ZA-PP-2026-01",
+    file: "/documents/privacy-notice.pdf",
     title: "Privacy Notice",
     description: "How Dr. Adil Zaman handles enquiries and visit counts on zamanadil.com.",
     sections: [
@@ -17,7 +18,7 @@ export const instruments = {
         heading: "2. Confidential professional correspondence",
         paragraphs: [
           "An enquiry sent through the contact form is treated as confidential professional correspondence. It is read in order to reply. It is not published on the website, added to a mailing list, sold, or shared for advertising.",
-          "Access to stored enquiries is limited to the private archive desk, which is available only to the proprietor after sign-in. A copy is also delivered to the proprietor’s professional inbox so the message can be answered if the desk is not open.",
+          "Access to stored enquiries is limited to the private archive desk, which is available only to the proprietor after sign-in. A copy is also delivered to the proprietor's professional inbox so the message can be answered if the desk is not open.",
         ],
       },
       {
@@ -30,7 +31,7 @@ export const instruments = {
       {
         heading: "4. Email delivery",
         paragraphs: [
-          "A copy of the enquiry is transmitted to the proprietor’s inbox through an email delivery service. That transmission contains the same fields you submitted. The delivery service processes the message only to carry it. It is not authorised to use the message for its own marketing.",
+          "A copy of the enquiry is transmitted to the proprietor's inbox through an email delivery service. That transmission contains the same fields you submitted. The delivery service processes the message only to carry it. It is not authorised to use the message for its own marketing.",
         ],
       },
       {
@@ -62,6 +63,7 @@ export const instruments = {
   },
   disclaimer: {
     ref: "ZA-ED-2026-01",
+    file: "/documents/academic-disclaimer.pdf",
     title: "Academic and Editorial Disclaimer",
     description: "The standing of research, reviews, and opinion published on zamanadil.com.",
     sections: [
@@ -107,6 +109,7 @@ export const instruments = {
   },
   accessibility: {
     ref: "ZA-AC-2026-01",
+    file: "/documents/accessibility-statement.pdf",
     title: "Accessibility Statement",
     description: "How zamanadil.com is intended to be used with a keyboard, a screen reader, and a small screen.",
     sections: [

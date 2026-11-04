@@ -334,19 +334,18 @@ export function Legal({ kind }) {
       <div className="frame page-pad">
         <article className="deed" aria-labelledby="deed-title">
           <header className="deed-head">
-            <div>
-              <p className="deed-kicker">zamanadil.com</p>
-              <p id="deed-title">{doc.title}</p>
-              <p>Dr. Adil Zaman</p>
-              <p>Department of Political Science and International Relations</p>
-              <p>University of Gujrat, Pakistan</p>
-            </div>
+            <p className="deed-kicker">zamanadil.com</p>
+            <p id="deed-title">{doc.title}</p>
+            <p>Dr. Adil Zaman</p>
+            <p>Department of Political Science and International Relations</p>
+            <p>University of Gujrat, Pakistan</p>
             <dl className="deed-meta">
               <div><dt>Document</dt><dd>{doc.ref}</dd></div>
               <div><dt>Issued</dt><dd>{ISSUED}</dd></div>
               <div><dt>Status</dt><dd>In force</dd></div>
               <div><dt>Standing</dt><dd>Public notice. Correspondence under it is confidential.</dd></div>
             </dl>
+            <p className="deed-download"><a className="btn line" href={doc.file}>Download PDF</a></p>
           </header>
           {doc.sections.map((section) => (
             <section key={section.heading}>
@@ -355,17 +354,11 @@ export function Legal({ kind }) {
             </section>
           ))}
           <footer className="deed-sign">
-            <div className="stamp" aria-hidden="true">
-              <span>Dr. Adil Zaman</span>
-              <strong>Attested</strong>
-              <small>zamanadil.com · 2026</small>
-            </div>
-            <div>
-              <p className="sign-name">Dr. Adil Zaman</p>
-              <p>Political Scientist and Researcher</p>
-              <p>Proprietor of zamanadil.com</p>
-              <p>Attested on {ISSUED}, in a personal professional capacity. This instrument is not a seal or decision of the University of Gujrat.</p>
-            </div>
+            <h2>Attestation</h2>
+            <p className="sign-name">Dr. Adil Zaman</p>
+            <p>Political Scientist and Researcher</p>
+            <p>Proprietor of zamanadil.com</p>
+            <p>Attested on {ISSUED} in a personal professional capacity. This instrument is not a seal or decision of the University of Gujrat.</p>
           </footer>
           <nav className="deed-related" aria-label="Related instruments">
             {others.map(([href, label]) => <Link key={href} to={href}>{label}</Link>)}
