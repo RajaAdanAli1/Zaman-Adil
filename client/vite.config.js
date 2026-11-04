@@ -23,6 +23,9 @@ export default defineConfig({
       "/sitemap-pages.xml": "http://localhost:5000",
       "/sitemap-publications.xml": "http://localhost:5000",
       "/sitemap-writing.xml": "http://localhost:5000",
+      "/llms.txt": "http://localhost:5000",
+      "/mcp": "http://localhost:5000",
+      "/.well-known": "http://localhost:5000",
     },
   },
 });

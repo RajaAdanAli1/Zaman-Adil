@@ -18,6 +18,11 @@ export const PROFILE = {
   description:
     "Dr. Adil Zaman researches elections, political behaviour, democratic institutions and the changing politics of Pakistan and South Asia.",
   imagePath: "/media/portrait.jpg",
+  profiles: [
+    "https://uog.edu.pk/faculty/ynj57cea53c00c28/adil-zaman",
+    "https://scholar.google.com/citations?user=PKR-O14AAAAJ",
+    "https://www.linkedin.com/in/adil-zaman-0a750060",
+  ],
   knowsAbout: [
     "Elections",
     "Electoral integrity",
@@ -79,6 +84,10 @@ export const PAGES = {
   "/accessibility": {
     title: "Accessibility",
     description: "Accessibility commitments for zamanadil.com.",
+  },
+  "/terms": {
+    title: "Terms",
+    description: "Terms of use for zamanadil.com, set out in the academic and editorial disclaimer.",
   },
 };
 
@@ -184,6 +193,38 @@ function personNode() {
     },
     knowsAbout: PROFILE.knowsAbout,
     knowsLanguage: ["en", "ur"],
+    sameAs: PROFILE.profiles,
+  };
+}
+
+function organizationNode() {
+  return {
+    "@type": "Organization",
+    "@id": `${ORIGIN}/#organization`,
+    name: PROFILE.name,
+    url: `${ORIGIN}/`,
+    description: PROFILE.description,
+    email: PROFILE.email,
+    logo: {
+      "@type": "ImageObject",
+      url: absoluteUrl("/media/logo.jpg"),
+    },
+    image: absoluteUrl(PROFILE.imagePath),
+    address: {
+      "@type": "PostalAddress",
+      streetAddress: "Hafiz Hayat Campus",
+      addressLocality: "Gujrat",
+      addressRegion: "Punjab",
+      addressCountry: "PK",
+    },
+    contactPoint: {
+      "@type": "ContactPoint",
+      contactType: "academic enquiries",
+      email: PROFILE.email,
+      url: `${ORIGIN}/contact`,
+      availableLanguage: ["English", "Urdu"],
+    },
+    sameAs: PROFILE.profiles,
   };
 }
 
@@ -194,7 +235,7 @@ function websiteNode() {
     name: PROFILE.name,
     url: `${ORIGIN}/`,
     description: PROFILE.description,
-    publisher: { "@id": `${ORIGIN}/#person` },
+    publisher: { "@id": `${ORIGIN}/#organization` },
     inLanguage: ["en", "ur"],
   };
 }
@@ -235,7 +276,7 @@ export function pageGraph({ title, description, path, lang = "en", image, extra 
   }
   return {
     "@context": "https://schema.org",
-    "@graph": [personNode(), websiteNode(), page, ...extra],
+    "@graph": [organizationNode(), personNode(), websiteNode(), page, ...extra],
   };
 }
 

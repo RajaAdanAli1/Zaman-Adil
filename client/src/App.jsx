@@ -43,6 +43,7 @@ export default function App() {
               <Route path="services" element={<Services />} />
               <Route path="contact" element={<Contact />} />
               <Route path="search" element={<SearchPage />} />
+              <Route path="terms" element={<Legal kind="disclaimer" />} />
               <Route path="privacy" element={<Legal kind="privacy" />} />
               <Route path="disclaimer" element={<Legal kind="disclaimer" />} />
               <Route path="accessibility" element={<Legal kind="accessibility" />} />

@@ -7,8 +7,25 @@ import adminRoutes from "./routes/admin.js";
 import { clientDist, clientIndex } from "./paths.js";
 import { publicError } from "./redact.js";
 import { ORIGIN } from "../../shared/seo.js";
-import { applyTemplate, pagesSitemapXml, publicationsSitemapXml, resolveDocument, robotsTxt, sitemapIndexXml, writingSitemapXml } from "./seo.js";
+import { applyTemplate, documentMarkdown, llmsTxt, pagesSitemapXml, publicationsSitemapXml, resolveDocument, robotsTxt, sitemapIndexXml, writingSitemapXml } from "./seo.js";
+import { handleMcp, mcpServerCard } from "./mcp.js";
 import { csrfProtection, originAllowed, securityHeaders, trustProxySetting } from "./security.js";
+
+function wantsMarkdown(req) {
+  return /text\/markdown/i.test(req.get("accept") || "");
+}
+
+function markdownRequestPath(requestPath) {
+  if (requestPath === "/index.md") return "/";
+  if (requestPath.endsWith("/index.md")) return requestPath.slice(0, -"/index.md".length) || "/";
+  if (requestPath.endsWith(".md")) return requestPath.slice(0, -3) || "/";
+  return "";
+}
+
+function agentLinkHeader(pagePath) {
+  const page = pagePath && pagePath !== "/" ? pagePath : "/";
+  return `</llms.txt>; rel="describedby"; type="text/markdown", <${page}>; rel="alternate"; type="text/markdown"`;
+}
 
 export function createApp() {
   const app = express();
@@ -55,6 +72,22 @@ export function createApp() {
 
   app.get("/robots.txt", (_req, res) => {
     sendText(res, "text/plain", robotsTxt());
+  });
+
+  app.get("/llms.txt", (_req, res) => {
+    sendText(res, "text/plain", llmsTxt());
+  });
+
+  app.get("/.well-known/mcp/server-card.json", (_req, res) => {
+    sendText(res, "application/json", JSON.stringify(mcpServerCard()));
+  });
+
+  app.post("/mcp", async (req, res, next) => {
+    try {
+      await handleMcp(req, res);
+    } catch (error) {
+      next(error);
+    }
   });
 
   app.get("/sitemap.xml", (_req, res) => {
@@ -115,14 +148,22 @@ export function createApp() {
       try {
         if (req.path === "/api" || req.path.startsWith("/api/")) return res.status(404).json({ error: "Not found." });
         if (req.path.includes("\0") || req.path.includes("..")) return res.status(404).end();
-        if (req.path.length > 1 && req.path.endsWith("/") && !path.extname(req.path)) {
+        const markdownPath = markdownRequestPath(req.path);
+        const pagePath = markdownPath || req.path;
+        if (!markdownPath && req.path.length > 1 && req.path.endsWith("/") && !path.extname(req.path)) {
           return res.redirect(301, req.path.replace(/\/+$/, "") || "/");
         }
-        if (path.extname(req.path)) return res.status(404).end();
+        if (!markdownPath && path.extname(req.path)) return res.status(404).end();
         const template = readTemplate();
-        const document = await resolveDocument(req.path);
+        const document = await resolveDocument(pagePath);
         if (document.robotsHeader) res.setHeader("X-Robots-Tag", document.robotsHeader);
         res.setHeader("Cache-Control", "no-cache");
+        res.setHeader("Vary", "Accept");
+        res.setHeader("Link", agentLinkHeader(pagePath));
+        if (markdownPath || wantsMarkdown(req)) {
+          res.setHeader("Content-Type", "text/markdown; charset=utf-8");
+          return res.status(document.status).send(documentMarkdown(document));
+        }
         res.status(document.status).type("html").send(applyTemplate(template, document));
       } catch (error) {
         next(error);

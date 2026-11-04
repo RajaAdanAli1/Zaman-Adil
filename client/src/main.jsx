@@ -2,9 +2,11 @@ import React from "react";
 import { createRoot } from "react-dom/client";
 import { BrowserRouter } from "react-router-dom";
 import App from "./App";
+import { registerAgentTools } from "./agentTools";
 import { loadReadingFonts, loadScriptFont } from "./fonts";
 import "./styles.css";
 
+registerAgentTools();
 loadScriptFont(document.documentElement.lang);
 const startReadingFonts = () => loadReadingFonts();
 if ("requestIdleCallback" in window) window.requestIdleCallback(startReadingFonts);

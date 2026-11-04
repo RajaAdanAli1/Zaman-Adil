@@ -41,6 +41,7 @@ export function headBlock(meta) {
   const title = documentTitle(meta.title);
   const description = clip(meta.description);
   const url = `${ORIGIN}${meta.path === "/" ? "/" : meta.path}`;
+  const canonical = `${ORIGIN}${(meta.canonicalPath || meta.path) === "/" ? "/" : (meta.canonicalPath || meta.path)}`;
   const image = socialFields(meta.image, meta.imageAlt);
   const robots = meta.robots || "index, follow";
   const locale = localeFor(meta.lang);
@@ -50,7 +51,7 @@ export function headBlock(meta) {
     `<meta name="description" content="${escapeHtml(description)}" />`,
     `<meta name="author" content="${escapeHtml(PROFILE.name)}" />`,
     `<meta name="robots" content="${escapeHtml(robots)}" />`,
-    `<link rel="canonical" href="${escapeHtml(url)}" />`,
+    `<link rel="canonical" href="${escapeHtml(canonical)}" />`,
     `<meta property="og:site_name" content="${escapeHtml(PROFILE.name)}" />`,
     `<meta property="og:type" content="${escapeHtml(meta.ogType || "website")}" />`,
     `<meta property="og:title" content="${escapeHtml(title)}" />`,
@@ -79,7 +80,13 @@ export function headBlock(meta) {
 }
 
 function shell(main) {
-  const links = nav
+  const links = [
+    ...nav,
+    ["/privacy", "Privacy"],
+    ["/terms", "Terms"],
+    ["/disclaimer", "Disclaimer"],
+    ["/accessibility", "Accessibility"],
+  ]
     .map(([href, label]) => `<a href="${escapeHtml(href)}">${escapeHtml(label)}</a>`)
     .join(" ");
   return `<nav>${links}</nav><main>${main}</main>`;
@@ -176,6 +183,17 @@ export async function resolveDocument(urlPath) {
   const opinion = path.match(/^\/opinion-blogs\/([^/]+)$/);
   if (opinion) return articleDocument(opinion[1], "opinion");
 
+  if (path === "/terms") {
+    const document = staticDocument("/disclaimer");
+    document.meta = {
+      ...document.meta,
+      title: "Terms",
+      path: "/terms",
+      canonicalPath: "/disclaimer",
+    };
+    document.bootstrap = { path: "/terms" };
+    return document;
+  }
   if (PAGES[path]) return staticDocument(path);
   return notFound(path);
 }
@@ -442,13 +460,18 @@ function urlset(entries) {
 
 export function sitemapIndexXml() {
   const maps = [SITEMAP_PAGES, SITEMAP_PUBLICATIONS, SITEMAP_WRITING];
-  const body = maps.map((path) => `<sitemap><loc>${xml(`${ORIGIN}${path}`)}</loc></sitemap>`).join("");
+  const revised = new Date().toISOString().slice(0, 10);
+  const body = maps
+    .map((path) => `<sitemap><loc>${xml(`${ORIGIN}${path}`)}</loc><lastmod>${revised}</lastmod></sitemap>`)
+    .join("");
   return `<?xml version="1.0" encoding="UTF-8"?>\n<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">${body}</sitemapindex>\n`;
 }
 
 export function pagesSitemapXml() {
-  return urlset(Object.keys(PAGES).map((path) => ({
+  const revised = new Date();
+  return urlset(Object.keys(PAGES).filter((path) => path !== "/terms").map((path) => ({
     loc: `${ORIGIN}${path === "/" ? "/" : path}`,
+    updated: revised,
     images: path === "/" || path === "/about"
       ? [{ loc: `${ORIGIN}${PROFILE.imagePath}`, title: "Portrait of Dr. Adil Zaman" }]
       : [],
@@ -459,7 +482,7 @@ export async function publicationsSitemapXml() {
   const items = await Publication.find().select("slug updatedAt title").lean();
   return urlset(items.map((item) => ({
     loc: `${ORIGIN}/publications/${item.slug}`,
-    updated: item.updatedAt,
+    updated: item.updatedAt || new Date(),
   })));
 }
 
@@ -470,7 +493,7 @@ export async function writingSitemapXml() {
     const image = item.image ? [{ loc: item.image, title: item.title, caption: item.imageAlt || item.title }] : [];
     return {
       loc: `${ORIGIN}${base}/${item.slug}`,
-      updated: item.updatedAt,
+      updated: item.updatedAt || new Date(),
       images: image.map((picture) => ({ ...picture, loc: picture.loc.startsWith("http") ? picture.loc : `${ORIGIN}${picture.loc.startsWith("/") ? picture.loc : `/${picture.loc}`}` })),
     };
   }));
@@ -483,8 +506,66 @@ export function robotsTxt() {
     "Disallow: /admin",
     "Disallow: /search",
     "Disallow: /api",
+    "Content-Signal: search=yes, ai-input=yes, ai-train=no",
     "",
     `Sitemap: ${ORIGIN}/sitemap.xml`,
     "",
   ].join("\n");
+}
+
+export function llmsTxt() {
+  const pages = [
+    ["About", "/about"],
+    ["Research Expertise", "/expertise"],
+    ["Publications", "/publications"],
+    ["Research Reviews", "/research-reviews"],
+    ["Opinion and Blogs", "/opinion-blogs"],
+    ["Services", "/services"],
+    ["Contact", "/contact"],
+    ["Privacy Notice", "/privacy"],
+    ["Terms", "/terms"],
+    ["Academic Disclaimer", "/disclaimer"],
+    ["Accessibility", "/accessibility"],
+  ];
+  return [
+    "# Dr. Adil Zaman",
+    "",
+    `> ${PROFILE.description}`,
+    "",
+    "Public faculty site for Dr. Adil Zaman, political scientist at the University of Gujrat. Research pages may be read and quoted. Enquiries sent through the contact form are confidential.",
+    "",
+    "## Pages",
+    "",
+    ...pages.map(([name, path]) => `- [${name}](${ORIGIN}${path}): ${PAGES[path].description}`),
+    "",
+    "## Documents",
+    "",
+    `- [Privacy Notice](${ORIGIN}/documents/privacy-notice.pdf): How contact enquiries and page counts are handled.`,
+    `- [Academic Disclaimer](${ORIGIN}/documents/academic-disclaimer.pdf): The terms of use and editorial disclaimer.`,
+    `- [Accessibility Statement](${ORIGIN}/documents/accessibility-statement.pdf): Accessibility commitments for the site.`,
+    "",
+  ].join("\n");
+}
+
+export function documentMarkdown(document) {
+  const title = document.meta?.title || PROFILE.name;
+  const description = document.meta?.description || "";
+  const path = document.meta?.path || "/";
+  const text = String(document.noscript || "")
+    .replace(/<a [^>]*href="([^"]+)"[^>]*>(.*?)<\/a>/gi, "[$2]($1)")
+    .replace(/<\/h1>/gi, "\n")
+    .replace(/<h1[^>]*>/gi, "# ")
+    .replace(/<\/h2>/gi, "\n")
+    .replace(/<h2[^>]*>/gi, "## ")
+    .replace(/<li[^>]*>/gi, "- ")
+    .replace(/<\/(p|li|nav|main|ul|article)>/gi, "\n")
+    .replace(/<[^>]+>/g, "")
+    .replace(/&amp;/g, "&")
+    .replace(/&lt;/g, "<")
+    .replace(/&gt;/g, ">")
+    .replace(/&quot;/g, "\"")
+    .replace(/[ \t]+\n/g, "\n")
+    .replace(/\n{3,}/g, "\n\n")
+    .trim();
+  return `# ${title}\n\n${description}\n\nSource: ${ORIGIN}${path}\n\n${text}\n`;
 }
