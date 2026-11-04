@@ -6,6 +6,7 @@ import { pathToFileURL, fileURLToPath } from "node:url";
 import { createApp } from "./app.js";
 import { assertRuntimeConfig } from "./auth.js";
 import { connectDatabase, disconnectDatabase, markDatabaseReady } from "./db.js";
+import { clientBuildIsCurrent, writeClientStamp } from "../../scripts/client-stamp.mjs";
 import { clientIndex, repoRoot } from "./paths.js";
 import { publicError } from "./redact.js";
 import { seedIfEmpty } from "./seed.js";
@@ -48,10 +49,11 @@ function viteBinary() {
 }
 
 export function ensureClientBuild() {
-  if (process.env.NODE_ENV !== "production" || fs.existsSync(clientIndex)) return;
+  if (process.env.NODE_ENV !== "production" || clientBuildIsCurrent()) return;
   const [major, minor] = process.versions.node.split(".").map(Number);
   const nodeOk = major > 22 || (major === 22 && minor >= 12) || (major === 20 && minor >= 19);
-  console.log(`Frontend build is missing. Node ${process.version} on ${process.platform}/${process.arch}.`);
+  const notice = fs.existsSync(clientIndex) ? "Frontend build does not match the client source." : "Frontend build is missing.";
+  console.log(`${notice} Node ${process.version} on ${process.platform}/${process.arch}.`);
   if (!nodeOk) {
     throw new Error(`Hostinger must use Node.js 22.12 or newer. This process is Node ${process.version}.`);
   }
@@ -71,6 +73,7 @@ export function ensureClientBuild() {
     const reason = result.error?.message || (result.signal ? `signal ${result.signal}` : `exit ${result.status}`);
     throw new Error(`Frontend build failed (${reason}). ${output}`.replace(/\s+/g, " ").slice(0, 350));
   }
+  writeClientStamp();
 }
 
 export function assertProductionBuild() {

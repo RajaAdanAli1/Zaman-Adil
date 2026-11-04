@@ -16,7 +16,7 @@
   "scripts": {
     "dev": "node scripts/dev.mjs",
     "start": "node server.js",
-    "build": "npm run build -w zamanadil-client",
+    "build": "npm run build -w zamanadil-client && node scripts/client-stamp.mjs",
     "audit": "npm audit",
     "verify": "node scripts/verify-production.mjs"
   },
