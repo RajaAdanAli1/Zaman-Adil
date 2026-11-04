@@ -93,8 +93,7 @@ Click Deploy. Hostinger installs dependencies from the root lockfile, runs `npm 
 
 After that:
 
-- `admin`
-- `AdilZaman-Admin-2026`
+
 
 ## Publications
 
