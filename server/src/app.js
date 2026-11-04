@@ -2,18 +2,18 @@ import express from "express";
 import cookieParser from "cookie-parser";
 import fs from "node:fs";
 import path from "node:path";
-import { fileURLToPath } from "node:url";
 import publicRoutes from "./routes/public.js";
 import adminRoutes from "./routes/admin.js";
+import { clientDist, clientIndex } from "./paths.js";
+import { publicError } from "./redact.js";
 import { applyTemplate, resolveDocument, robotsTxt, sitemapXml } from "./seo.js";
-import { csrfProtection, originAllowed, securityHeaders } from "./security.js";
-
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
+import { csrfProtection, originAllowed, securityHeaders, trustProxySetting } from "./security.js";
 
 export function createApp() {
   const app = express();
   app.disable("x-powered-by");
-  if (process.env.TRUST_PROXY === "1") app.set("trust proxy", 1);
+  const proxyHops = trustProxySetting();
+  if (proxyHops) app.set("trust proxy", proxyHops);
 
   app.use(securityHeaders);
   app.use((req, res, next) => {
@@ -31,6 +31,10 @@ export function createApp() {
   app.use(express.json({ limit: "512kb" }));
   app.use(cookieParser());
   app.use(csrfProtection);
+  app.use("/api", (_req, res, next) => {
+    res.setHeader("Cache-Control", "no-store");
+    next();
+  });
 
   app.get("/api/health", (_req, res) => res.json({ ok: true }));
   app.use("/api/admin", adminRoutes);
@@ -49,13 +53,28 @@ export function createApp() {
     }
   });
 
-  const clientDist = path.join(__dirname, "..", "..", "client", "dist");
-  const clientIndex = path.join(clientDist, "index.html");
   if (fs.existsSync(clientIndex)) {
-    app.use(express.static(clientDist, { index: false, maxAge: process.env.NODE_ENV === "production" ? "1h" : 0 }));
+    const production = process.env.NODE_ENV === "production";
+    app.use(express.static(clientDist, {
+      index: false,
+      dotfiles: "ignore",
+      redirect: false,
+      maxAge: production ? "1h" : 0,
+      setHeaders(res, filePath) {
+        if (!production) return;
+        if (filePath.endsWith(`${path.sep}index.html`)) {
+          res.setHeader("Cache-Control", "no-cache");
+          return;
+        }
+        if (filePath.split(path.sep).includes("assets")) {
+          res.setHeader("Cache-Control", "public, max-age=31536000, immutable");
+        }
+      },
+    }));
     app.get("*", async (req, res, next) => {
       try {
-        if (req.path.startsWith("/api")) return res.status(404).json({ error: "Not found." });
+        if (req.path === "/api" || req.path.startsWith("/api/")) return res.status(404).json({ error: "Not found." });
+        if (req.path.includes("\0") || req.path.includes("..")) return res.status(404).end();
         if (req.path.length > 1 && req.path.endsWith("/") && !path.extname(req.path)) {
           return res.redirect(301, req.path.replace(/\/+$/, "") || "/");
         }
@@ -63,6 +82,7 @@ export function createApp() {
         const template = fs.readFileSync(clientIndex, "utf8");
         const document = await resolveDocument(req.path);
         if (document.robotsHeader) res.setHeader("X-Robots-Tag", document.robotsHeader);
+        res.setHeader("Cache-Control", "no-cache");
         res.status(document.status).type("html").send(applyTemplate(template, document));
       } catch (error) {
         next(error);
@@ -82,7 +102,7 @@ export function createApp() {
             : error?.status && error.status < 500
               ? error.status
               : 500;
-    if (status >= 500) console.error(error?.name || "Error", error?.message || "request failed");
+    if (status >= 500) console.error(error?.name || "Error", publicError(error));
     const message = status === 409
       ? "That record already exists."
       : status === 413

@@ -33,7 +33,7 @@ Browser (React)
 Express server (:5000)
     │
     ▼
-MongoDB  (MONGO_URI, local Mongo, or in-memory for local dev)
+MongoDB  (MONGO_URI, local Mongo for development, or in-memory only outside production)
 ```
 
 **Local development**
@@ -123,13 +123,12 @@ On navigation, the client can `POST /api/track` with the path. Counts are stored
 | **User** | Admin username, password hash, `mustChangePassword` flag |
 | **Pageview** | Path + day + view count |
 
-On first start with an empty database, `seed.js` loads the publication and article archive (and the default admin user).
+On first start with an empty database, `seed.js` loads the publication and article archive and creates the admin user. Production refuses the built-in development password and will not start until `ADMIN_PASSWORD` is set.
 
-**Database connection order** (`server/src/db.js`):
+**Database connection** (`server/src/db.js`):
 
-1. Use `MONGO_URI` if set  
-2. Else try local `mongodb://127.0.0.1:27017/zamanadil`  
-3. Else start an in-memory MongoDB for development  
+- Production requires `MONGO_URI` (or `MONGODB_URI` if `MONGO_URI` is empty) and exits if it is missing or the database cannot be reached. It never starts an in-memory database.
+- Development uses `MONGO_URI` when set, otherwise local `mongodb://127.0.0.1:27017/zamanadil`, and only then an in-memory database.  
 
 ---
 
@@ -216,7 +215,7 @@ npm install --prefix client
 npm run dev
 ```
 
-Optional: copy `server/.env.example` to `server/.env` and set `MONGO_URI`, `JWT_SECRET`, `CLIENT_ORIGIN`, and `PORT` for a real database and production-safe sessions.
+Optional for local development: copy `server/.env.example` to `server/.env`. Production configuration belongs in the host's environment, not in that file. See [README.md](README.md) for the Hostinger deployment settings.
 
 ---
 

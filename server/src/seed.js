@@ -2,12 +2,12 @@ import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import bcrypt from "bcryptjs";
-import { DEFAULT_ADMIN_PASSWORD } from "../../shared/catalog.js";
 import { doiUrl, httpUrl } from "../../shared/links.js";
 import { Publication, Article, User } from "./models.js";
 import { publications } from "./publications.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const DEV_ADMIN_PASSWORD = "AdilZaman-Admin-2026";
 
 export function canonicalLink(item) {
   return doiUrl(item.doi) || httpUrl(item.url) || httpUrl(item.pdf) || "";
@@ -71,19 +71,18 @@ export async function seedIfEmpty() {
   const users = await User.countDocuments();
   if (users === 0) {
     const username = (process.env.ADMIN_USERNAME || "admin").trim() || "admin";
-    const password = process.env.ADMIN_PASSWORD || DEFAULT_ADMIN_PASSWORD;
+    const configured = process.env.ADMIN_PASSWORD || "";
     const production = process.env.NODE_ENV === "production";
-    if (production && (!process.env.ADMIN_PASSWORD || password === DEFAULT_ADMIN_PASSWORD)) {
-      console.error("Production startup did not create an admin user. Set ADMIN_PASSWORD to a unique value. The built-in development password is refused.");
-    } else {
-      await User.create({
-        username,
-        passwordHash: await bcrypt.hash(password, 12),
-        mustChangePassword: true,
-        sessionVersion: 0,
-      });
-      console.log(`Admin user created: ${username}`);
+    if (production && (configured.length < 10 || configured === DEV_ADMIN_PASSWORD)) {
+      throw new Error("ADMIN_PASSWORD must be a unique password of at least 10 characters to create the first admin account. The built-in development password is refused.");
     }
+    await User.create({
+      username,
+      passwordHash: await bcrypt.hash(configured || DEV_ADMIN_PASSWORD, 12),
+      mustChangePassword: true,
+      sessionVersion: 0,
+    });
+    console.log(`Admin user created: ${username}`);
   }
   await User.updateMany({ mustChangePassword: { $exists: false } }, { $set: { mustChangePassword: true } });
 }

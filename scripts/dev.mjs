@@ -1,8 +1,8 @@
 import { spawn } from "node:child_process";
 
 const children = [
-  spawn("npm", ["run", "dev", "--prefix", "server"], { stdio: "inherit", shell: true }),
-  spawn("npm", ["run", "dev", "--prefix", "client"], { stdio: "inherit", shell: true }),
+  spawn("npm", ["run", "dev", "-w", "zamanadil-server"], { stdio: "inherit", shell: true }),
+  spawn("npm", ["run", "dev", "-w", "zamanadil-client"], { stdio: "inherit", shell: true }),
 ];
 
 function stop() {

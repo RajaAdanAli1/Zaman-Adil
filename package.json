@@ -2,10 +2,24 @@
   "name": "zamanadil",
   "private": true,
   "type": "module",
+  "main": "server.js",
+  "engines": {
+    "node": ">=20"
+  },
+  "workspaces": [
+    "client",
+    "server"
+  ],
   "scripts": {
     "dev": "node scripts/dev.mjs",
-    "start": "npm start --prefix server",
-    "build": "npm run build --prefix client",
-    "audit": "npm audit --prefix server && npm audit --prefix client"
+    "start": "node server.js",
+    "build": "npm run build -w zamanadil-client",
+    "audit": "npm audit",
+    "verify": "node scripts/verify-production.mjs"
+  },
+  "overrides": {
+    "body-parser": "1.20.9",
+    "follow-redirects": "1.16.2",
+    "qs": "6.16.1"
   }
 }

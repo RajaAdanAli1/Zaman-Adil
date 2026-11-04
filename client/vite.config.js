@@ -7,6 +7,12 @@ const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 
 export default defineConfig({
   plugins: [react()],
+  base: "/",
+  build: {
+    outDir: "dist",
+    sourcemap: false,
+    emptyOutDir: true,
+  },
   server: {
     port: 5173,
     fs: { allow: [root] },

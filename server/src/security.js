@@ -75,10 +75,36 @@ export function securityHeaders(_req, res, next) {
 
 const UNSAFE = new Set(["POST", "PUT", "PATCH", "DELETE"]);
 
+export function trustProxySetting() {
+  const raw = (process.env.TRUST_PROXY ?? "").trim().toLowerCase();
+  if (raw === "0" || raw === "false" || raw === "off") return false;
+  if (raw === "1" || raw === "true" || raw === "on") return 1;
+  if (/^[2-9]$/.test(raw)) return Number(raw);
+  return process.env.NODE_ENV === "production" ? 1 : false;
+}
+
+function refererOrigin(req) {
+  const referer = req.get("referer");
+  if (!referer) return "";
+  try {
+    return new URL(referer).origin;
+  } catch {
+    return "invalid";
+  }
+}
+
 export function csrfProtection(req, res, next) {
   if (!UNSAFE.has(req.method) || !req.path.startsWith("/api")) return next();
+  if (req.get("sec-fetch-site") === "cross-site") {
+    return res.status(403).json({ error: "This request was rejected." });
+  }
   const origin = req.get("origin");
-  if (!origin) return next();
-  if (originAllowed(origin, req)) return next();
+  if (origin) {
+    if (originAllowed(origin, req)) return next();
+    return res.status(403).json({ error: "This request was rejected." });
+  }
+  const fromReferer = refererOrigin(req);
+  if (!fromReferer) return next();
+  if (fromReferer !== "invalid" && originAllowed(fromReferer, req)) return next();
   return res.status(403).json({ error: "This request was rejected." });
 }

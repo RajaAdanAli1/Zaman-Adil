@@ -1,18 +1,21 @@
 import mongoose from "mongoose";
-import { MongoMemoryServer } from "mongodb-memory-server";
 
 let memoryServer;
 
 const LOCAL_URI = "mongodb://127.0.0.1:27017/zamanadil";
 
+export function configuredDatabaseUri() {
+  return process.env.MONGO_URI?.trim() || process.env.MONGODB_URI?.trim() || "";
+}
+
 export function resolveDatabasePlan() {
-  const configured = process.env.MONGO_URI?.trim() || "";
+  const configured = configuredDatabaseUri();
   const env = process.env.NODE_ENV || "development";
   if (env === "production") {
     if (!configured) {
       return {
         action: "fail",
-        reason: "MONGO_URI is required in production. In-memory MongoDB is disabled so saved work cannot disappear on restart.",
+        reason: "MONGO_URI is required in production. MONGODB_URI is accepted when MONGO_URI is empty. In-memory MongoDB is disabled so saved work cannot disappear on restart.",
       };
     }
     return { action: "uri", uri: configured };
@@ -62,7 +65,8 @@ export async function connectDatabase() {
   if (plan.action === "uri") {
     assertTestDatabase(plan.uri);
     await mongoose.connect(plan.uri, connectOptions());
-    console.log("MongoDB connected");
+    const name = databaseName(plan.uri);
+    console.log(name ? `MongoDB connected (${name})` : "MongoDB connected");
     return;
   }
 
@@ -76,6 +80,7 @@ export async function connectDatabase() {
     throw new Error("Refusing to start an in-memory database in production.");
   }
 
+  const { MongoMemoryServer } = await import("mongodb-memory-server");
   memoryServer = await MongoMemoryServer.create({
     instance: { dbName: process.env.NODE_ENV === "test" ? "zamanadil_test" : "zamanadil" },
   });
