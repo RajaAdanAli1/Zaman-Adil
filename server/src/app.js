@@ -6,7 +6,8 @@ import publicRoutes from "./routes/public.js";
 import adminRoutes from "./routes/admin.js";
 import { clientDist, clientIndex } from "./paths.js";
 import { publicError } from "./redact.js";
-import { applyTemplate, resolveDocument, robotsTxt, sitemapXml } from "./seo.js";
+import { ORIGIN } from "../../shared/seo.js";
+import { applyTemplate, pagesSitemapXml, publicationsSitemapXml, resolveDocument, robotsTxt, sitemapIndexXml, writingSitemapXml } from "./seo.js";
 import { csrfProtection, originAllowed, securityHeaders, trustProxySetting } from "./security.js";
 
 export function createApp() {
@@ -14,6 +15,12 @@ export function createApp() {
   app.disable("x-powered-by");
   const proxyHops = trustProxySetting();
   if (proxyHops) app.set("trust proxy", proxyHops);
+
+  app.use((req, res, next) => {
+    if (process.env.NODE_ENV !== "production" || req.hostname !== "www.zamanadil.com") return next();
+    const status = req.method === "GET" || req.method === "HEAD" ? 301 : 308;
+    return res.redirect(status, `${ORIGIN}${req.originalUrl}`);
+  });
 
   app.use(securityHeaders);
   app.use((req, res, next) => {
@@ -41,13 +48,34 @@ export function createApp() {
   app.use("/api", publicRoutes);
   app.use("/api", (_req, res) => res.status(404).json({ error: "Not found." }));
 
+  function sendText(res, type, body) {
+    res.setHeader("Cache-Control", "public, max-age=3600");
+    res.type(type).send(body);
+  }
+
   app.get("/robots.txt", (_req, res) => {
-    res.type("text/plain").send(robotsTxt());
+    sendText(res, "text/plain", robotsTxt());
   });
 
-  app.get("/sitemap.xml", async (_req, res, next) => {
+  app.get("/sitemap.xml", (_req, res) => {
+    sendText(res, "application/xml", sitemapIndexXml());
+  });
+
+  app.get("/sitemap-pages.xml", (_req, res) => {
+    sendText(res, "application/xml", pagesSitemapXml());
+  });
+
+  app.get("/sitemap-publications.xml", async (_req, res, next) => {
     try {
-      res.type("application/xml").send(await sitemapXml());
+      sendText(res, "application/xml", await publicationsSitemapXml());
+    } catch (error) {
+      next(error);
+    }
+  });
+
+  app.get("/sitemap-writing.xml", async (_req, res, next) => {
+    try {
+      sendText(res, "application/xml", await writingSitemapXml());
     } catch (error) {
       next(error);
     }

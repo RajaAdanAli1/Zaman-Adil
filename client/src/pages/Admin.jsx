@@ -3,7 +3,6 @@ import { Link, NavLink, Outlet, Route, Routes, useLocation, useNavigate } from "
 import { api } from "../api";
 import { contentFrom, contentTo } from "../articleText";
 import { otherLang } from "../../../shared/reading.js";
-import { LanguageMenu } from "../components/LanguageMenu";
 import { ReadingProvider } from "../reading";
 import { applyRobots } from "../seo";
 import { PUBLICATION_TYPES } from "../../../shared/catalog.js";
@@ -163,7 +162,6 @@ function Shell() {
           <span className="menu-bars" aria-hidden="true"><span /><span /><span /></span>
         </button>
         <strong>Research desk</strong>
-        <LanguageMenu align="end" />
       </div>
       {menuOpen && <button className="desk-scrim" type="button" aria-label="Close menu" onClick={() => setMenuOpen(false)} />}
       <aside className="desk-side" id="desk-nav" ref={sideRef}>
@@ -173,9 +171,6 @@ function Shell() {
             <strong>Research desk</strong>
             <small>Dr. Adil Zaman</small>
           </div>
-        </div>
-        <div className="desk-lang">
-          <LanguageMenu align="start" />
         </div>
         <nav className="desk-nav" aria-label="Desk" onClick={() => setMenuOpen(false)}>
           <NavLink to="/admin" end>Overview</NavLink>
@@ -235,7 +230,6 @@ function Login() {
   return (
     <div className="login-wrap">
       <form className="login-card contact-form" onSubmit={submit}>
-        <div className="login-lang"><LanguageMenu align="end" /></div>
         <img className="login-seal" src="/media/logo.png" alt="" />
         <p className="kicker">Private</p>
         <h1>Research desk</h1>

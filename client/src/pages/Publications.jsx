@@ -3,7 +3,9 @@ import { Link, useParams } from "react-router-dom";
 import { api } from "../api";
 import { usePage } from "../components/Chrome";
 import { PublicationCard } from "../components/Cards";
+import { LanguageMenu } from "../components/LanguageMenu";
 import { ReadingBar } from "../components/ReadingBar";
+import { contentLanguages } from "../../../shared/seo.js";
 import { breadcrumbNode, itemListNode, readBootstrap, scholarlyNode } from "../seo";
 import { doiUrl, safeHref } from "../../../shared/links.js";
 import { selectEdition, textLang, typeHeading, typeName } from "../../../shared/reading.js";
@@ -51,6 +53,7 @@ export default function Publications() {
     <article>
       <header className="page-hero scene" data-scene="journals" lang={reading.lang} dir={reading.dir}>
         <div className="frame">
+          <div className="reading-switch"><LanguageMenu align="end" /></div>
           <p className="eyebrow"><span>{t.archive}</span></p>
           <h1>{t.publications}</h1>
           <p className="lede">{t.pubLede}</p>
@@ -140,6 +143,7 @@ export function PublicationPage() {
     edition
       ? {
           lang: edition.lang,
+          languages: contentLanguages(item.lang, item.alt?.lang),
           ogType: "article",
           jsonLd: [
             scholarlyNode({ ...item, title: edition.title, summary: edition.summary || item.summary, lang: edition.lang }),
@@ -172,6 +176,7 @@ export function PublicationPage() {
     <article>
       <header className="page-hero scene" data-scene="journals">
         <div className="frame">
+          <div className="reading-switch"><LanguageMenu align="end" /></div>
           <ReadingBar />
           <p className="breadcrumb" lang={reading.lang} dir={reading.dir}><Link to="/">{t.home}</Link> / <Link to="/publications">{t.publications}</Link></p>
           <p className="kicker"><LiveText text={typeName(item.type, reading.lang)} source={textLang(typeName(item.type, reading.lang))} /> · {item.year}</p>

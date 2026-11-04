@@ -20,6 +20,9 @@ export default defineConfig({
       "/api": "http://localhost:5000",
       "/robots.txt": "http://localhost:5000",
       "/sitemap.xml": "http://localhost:5000",
+      "/sitemap-pages.xml": "http://localhost:5000",
+      "/sitemap-publications.xml": "http://localhost:5000",
+      "/sitemap-writing.xml": "http://localhost:5000",
     },
   },
 });

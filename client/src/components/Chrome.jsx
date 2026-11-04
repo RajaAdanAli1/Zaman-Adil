@@ -4,7 +4,6 @@ import { nav } from "../content";
 import { api } from "../api";
 import { applyHead } from "../seo";
 import { navLabel } from "../../../shared/reading.js";
-import { LanguageMenu } from "./LanguageMenu";
 import { ReadingProvider, useReading } from "../reading";
 
 export function Seal() {
@@ -20,7 +19,9 @@ export function usePage(title, description, extra = {}) {
   const path = extra.path || location.pathname;
   const robots = extra.robots;
   const image = extra.image || "";
+  const imageAlt = extra.imageAlt || "";
   const lang = extra.lang || "en";
+  const languagesKey = JSON.stringify(extra.languages || []);
   const ogType = extra.ogType || "website";
   const jsonKey = JSON.stringify(extra.jsonLd || null);
   useEffect(() => {
@@ -31,11 +32,13 @@ export function usePage(title, description, extra = {}) {
       path,
       robots,
       image,
+      imageAlt,
       lang,
+      languages: JSON.parse(languagesKey),
       ogType,
       jsonLd: jsonKey === "null" ? undefined : JSON.parse(jsonKey),
     });
-  }, [title, description, path, robots, image, lang, ogType, jsonKey]);
+  }, [title, description, path, robots, image, imageAlt, lang, languagesKey, ogType, jsonKey]);
 }
 
 export function Layout({ children }) {
@@ -166,7 +169,6 @@ function SiteChrome({ children }) {
               <small>Political Scientist & Researcher</small>
             </span>
           </Link>
-          <LanguageMenu align="start" />
           <nav
             id="primary-nav"
             ref={navRef}

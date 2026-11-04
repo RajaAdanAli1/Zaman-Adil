@@ -1,10 +1,19 @@
 export const ORIGIN = "https://zamanadil.com";
 
+export const SOCIAL = {
+  path: "/media/og-image.jpg",
+  width: 1200,
+  height: 630,
+  type: "image/jpeg",
+  alt: "Dr. Adil Zaman, political scientist at the University of Gujrat",
+};
+
 export const PROFILE = {
   name: "Dr. Adil Zaman",
   jobTitle: "Political Scientist",
   email: "adil.zaman@uog.edu.pk",
   affiliation: "University of Gujrat",
+  affiliationUrl: "https://uog.edu.pk",
   department: "Department of Political Science and International Relations",
   description:
     "Dr. Adil Zaman researches elections, political behaviour, democratic institutions and the changing politics of Pakistan and South Asia.",
@@ -97,6 +106,48 @@ export function absoluteUrl(pathOrUrl) {
   return `${ORIGIN}${value.startsWith("/") ? value : `/${value}`}`;
 }
 
+export function localeFor(lang) {
+  return lang === "ur" ? "ur_PK" : "en_US";
+}
+
+export function contentLanguages(...values) {
+  const codes = [];
+  for (const value of values.flat()) {
+    const code = value === "ur" ? "ur" : value === "en" ? "en" : "";
+    if (code && !codes.includes(code)) codes.push(code);
+  }
+  return codes;
+}
+
+export function alternateLocales(lang, languages = []) {
+  const current = localeFor(lang === "ur" ? "ur" : "en");
+  return contentLanguages(languages)
+    .map(localeFor)
+    .filter((item) => item !== current);
+}
+
+export function socialFields(image, imageAlt) {
+  const url = absoluteUrl(image || SOCIAL.path);
+  const branded = url === absoluteUrl(SOCIAL.path);
+  const type = branded
+    ? SOCIAL.type
+    : url.endsWith(".png")
+      ? "image/png"
+      : url.endsWith(".webp")
+        ? "image/webp"
+        : url.endsWith(".jpg") || url.endsWith(".jpeg")
+          ? "image/jpeg"
+          : "";
+  return {
+    url,
+    alt: imageAlt || (branded ? SOCIAL.alt : ""),
+    width: branded ? String(SOCIAL.width) : "",
+    height: branded ? String(SOCIAL.height) : "",
+    type,
+    secureUrl: url.startsWith("https://") ? url : "",
+  };
+}
+
 export function robotsFor(path) {
   if (path === "/search" || path.startsWith("/admin")) return "noindex, nofollow";
   return "index, follow";
@@ -114,12 +165,25 @@ function personNode() {
     worksFor: {
       "@type": "CollegeOrUniversity",
       name: PROFILE.affiliation,
+      url: PROFILE.affiliationUrl,
       department: {
         "@type": "Organization",
         name: PROFILE.department,
       },
     },
+    address: {
+      "@type": "PostalAddress",
+      addressLocality: "Gujrat",
+      addressCountry: "PK",
+    },
+    contactPoint: {
+      "@type": "ContactPoint",
+      email: PROFILE.email,
+      contactType: "academic",
+      availableLanguage: ["English", "Urdu"],
+    },
     knowsAbout: PROFILE.knowsAbout,
+    knowsLanguage: ["en", "ur"],
   };
 }
 
@@ -131,32 +195,47 @@ function websiteNode() {
     url: `${ORIGIN}/`,
     description: PROFILE.description,
     publisher: { "@id": `${ORIGIN}/#person` },
-    potentialAction: {
-      "@type": "SearchAction",
-      target: `${ORIGIN}/search?q={search_term_string}`,
-      "query-input": "required name=search_term_string",
-    },
+    inLanguage: ["en", "ur"],
   };
 }
 
-export function pageGraph({ title, description, path, extra = [] }) {
+function pageType(path) {
+  if (path === "/about") return "ProfilePage";
+  if (path === "/contact") return "ContactPage";
+  if (path === "/search") return "SearchResultsPage";
+  return "WebPage";
+}
+
+export function pageGraph({ title, description, path, lang = "en", image, extra = [] }) {
+  const page = {
+    "@type": pageType(path),
+    "@id": `${absoluteUrl(path)}#webpage`,
+    url: absoluteUrl(path),
+    name: documentTitle(title),
+    description: clip(description),
+    isPartOf: { "@id": `${ORIGIN}/#website` },
+    about: { "@id": `${ORIGIN}/#person` },
+    inLanguage: lang === "ur" ? "ur" : "en",
+  };
+  if (path === "/" || path === "/about") page.mainEntity = { "@id": `${ORIGIN}/#person` };
+  const picture = image
+    ? absoluteUrl(image)
+    : path === "/" || path === "/about"
+      ? absoluteUrl(PROFILE.imagePath)
+      : "";
+  if (picture) {
+    page.primaryImageOfPage = {
+      "@type": "ImageObject",
+      url: picture,
+      ...(picture === absoluteUrl(PROFILE.imagePath) ? { caption: "Portrait of Dr. Adil Zaman" } : {}),
+      ...(picture === absoluteUrl(SOCIAL.path)
+        ? { width: SOCIAL.width, height: SOCIAL.height, caption: SOCIAL.alt }
+        : {}),
+    };
+  }
   return {
     "@context": "https://schema.org",
-    "@graph": [
-      personNode(),
-      websiteNode(),
-      {
-        "@type": "WebPage",
-        "@id": `${absoluteUrl(path)}#webpage`,
-        url: absoluteUrl(path),
-        name: documentTitle(title),
-        description: clip(description),
-        isPartOf: { "@id": `${ORIGIN}/#website` },
-        about: { "@id": `${ORIGIN}/#person` },
-        inLanguage: "en",
-      },
-      ...extra,
-    ],
+    "@graph": [personNode(), websiteNode(), page, ...extra],
   };
 }
 
@@ -179,13 +258,15 @@ export function articleNode(article, path) {
     headline: article.title,
     description: clip(article.excerpt || article.subtitle || article.title),
     datePublished: article.date,
+    ...(article.updatedAt ? { dateModified: article.updatedAt } : {}),
     inLanguage: article.alt?.lang
       ? [article.lang === "ur" ? "ur" : "en", article.alt.lang === "ur" ? "ur" : "en"]
       : (article.lang === "ur" ? "ur" : "en"),
-    image: absoluteUrl(article.image || PROFILE.imagePath),
+    image: absoluteUrl(article.image || SOCIAL.path),
     author: { "@id": `${ORIGIN}/#person` },
     publisher: { "@id": `${ORIGIN}/#person` },
-    mainEntityOfPage: absoluteUrl(path),
+    mainEntityOfPage: { "@id": `${absoluteUrl(path)}#webpage` },
+    isAccessibleForFree: true,
     articleSection: article.category || undefined,
     ...(article.doi ? { sameAs: `https://doi.org/${String(article.doi).replace(/^https?:\/\/(dx\.)?doi\.org\//i, "")}` } : {}),
   };
@@ -213,6 +294,7 @@ export function scholarlyNode(item) {
     name: item.title,
     author: authorNodes(item.authors),
     datePublished: String(item.year || ""),
+    ...(item.updatedAt ? { dateModified: item.updatedAt } : {}),
     inLanguage: item.alt?.lang ? [item.lang === "ur" ? "ur" : "en", item.alt.lang === "ur" ? "ur" : "en"] : (item.lang === "ur" ? "ur" : "en"),
     description: clip(item.summary || `${item.authors}. ${item.venue}, ${item.year}.`),
     isPartOf: item.venue ? { "@type": "Periodical", name: item.venue } : undefined,

@@ -2,15 +2,17 @@ import { readingCode } from "../../shared/reading.js";
 import {
   ORIGIN,
   PROFILE,
-  absoluteUrl,
+  alternateLocales,
   articleNode,
   breadcrumbNode,
   clip,
   documentTitle,
   itemListNode,
+  localeFor,
   pageGraph,
   robotsFor,
   scholarlyNode,
+  socialFields,
 } from "../../shared/seo.js";
 
 export { articleNode, breadcrumbNode, itemListNode, scholarlyNode };
@@ -56,12 +58,13 @@ function upsertLink(rel, href) {
   node.setAttribute("href", href);
 }
 
-export function applyHead({ title, description, path, robots, image, lang, jsonLd, ogType }) {
+export function applyHead({ title, description, path, robots, image, imageAlt, lang, languages, jsonLd, ogType }) {
   if (!title) return;
   const branded = documentTitle(title);
   const summary = clip(description || "");
   const url = `${ORIGIN}${path && path !== "/" ? path : "/"}`;
-  const picture = absoluteUrl(image || PROFILE.imagePath);
+  const picture = socialFields(image, imageAlt);
+  const pageLang = lang === "ur" ? "ur" : "en";
   document.title = branded;
   document.documentElement.lang = readingCode(lang);
   upsertMeta("name", "description", summary);
@@ -73,12 +76,26 @@ export function applyHead({ title, description, path, robots, image, lang, jsonL
   upsertMeta("property", "og:title", branded);
   upsertMeta("property", "og:description", summary);
   upsertMeta("property", "og:url", url);
-  upsertMeta("property", "og:image", picture);
-  upsertMeta("property", "og:locale", lang === "ur" ? "ur_PK" : "en_US");
+  upsertMeta("property", "og:image", picture.url);
+  upsertMeta("property", "og:image:secure_url", picture.secureUrl);
+  upsertMeta("property", "og:image:type", picture.type);
+  upsertMeta("property", "og:image:width", picture.width);
+  upsertMeta("property", "og:image:height", picture.height);
+  upsertMeta("property", "og:image:alt", picture.alt);
+  upsertMeta("property", "og:locale", localeFor(pageLang));
+  const alternates = alternateLocales(pageLang, languages);
+  document.head.querySelectorAll('meta[property="og:locale:alternate"]').forEach((node) => node.remove());
+  for (const alternate of alternates) {
+    const node = document.createElement("meta");
+    node.setAttribute("property", "og:locale:alternate");
+    node.setAttribute("content", alternate);
+    document.head.appendChild(node);
+  }
   upsertMeta("name", "twitter:card", "summary_large_image");
   upsertMeta("name", "twitter:title", branded);
   upsertMeta("name", "twitter:description", summary);
-  upsertMeta("name", "twitter:image", picture);
+  upsertMeta("name", "twitter:image", picture.url);
+  upsertMeta("name", "twitter:image:alt", picture.alt);
   const scriptId = "seo-jsonld";
   let script = document.getElementById(scriptId);
   if (!script) {
@@ -88,8 +105,8 @@ export function applyHead({ title, description, path, robots, image, lang, jsonL
     document.head.appendChild(script);
   }
   const graph = Array.isArray(jsonLd)
-    ? pageGraph({ title, description: summary, path: path || "/", extra: jsonLd })
-    : jsonLd || pageGraph({ title, description: summary, path: path || "/" });
+    ? pageGraph({ title, description: summary, path: path || "/", lang: pageLang, image, extra: jsonLd })
+    : jsonLd || pageGraph({ title, description: summary, path: path || "/", lang: pageLang, image });
   script.textContent = JSON.stringify(graph).replace(/</g, "\\u003c");
 }
 

@@ -8,6 +8,7 @@ import { ReadingBar } from "../components/ReadingBar";
 import { selectEdition, textLang, typeLabel } from "../../../shared/reading.js";
 import { LiveText } from "../components/LiveText";
 import { useReading } from "../reading";
+import { ISSUED, instruments } from "../legalDocuments";
 
 export function About() {
   usePage("About", "Dr. Adil Zaman is a political scientist, researcher and academic specialising in elections, political behaviour, democratic institutions and South Asian politics.");
@@ -314,53 +315,62 @@ export function SearchPage() {
 }
 
 export function Legal({ kind }) {
-  const docs = {
-    privacy: ["Privacy Policy", "How zamanadil.com handles contact enquiries and first-party page counts."],
-    disclaimer: ["Academic and Editorial Disclaimer", "Academic and editorial disclaimer for material published on zamanadil.com."],
-    accessibility: ["Accessibility", "Accessibility commitments for zamanadil.com."],
-  };
-  const [title, description] = docs[kind];
-  usePage(title, description);
+  const doc = instruments[kind];
+  usePage(doc.title, doc.description);
+  const others = [
+    ["/privacy", "Privacy Notice"],
+    ["/disclaimer", "Disclaimer"],
+    ["/accessibility", "Accessibility Statement"],
+  ].filter(([href]) => href !== `/${kind}`);
   return (
     <article>
-      <header className="page-hero scene" data-scene="journals"><div className="frame"><h1>{title}</h1></div></header>
-      <div className="frame measure prose page-pad">
-        {kind === "privacy" && (
-          <>
-            <p>This website publishes academic and professional information about Dr. Adil Zaman. Public comments are not enabled.</p>
-            <h2>Contact form</h2>
-            <p>If you send a message, the form collects your name, email address, the optional institution and country fields, the nature of the enquiry, the subject and the message. That information is used only to read and reply to the enquiry.</p>
-            <p>Messages are stored in the private admin desk, and a copy is emailed to the site owner. A one-way hash of the connection address is stored with the message so repeated automated submissions can be limited. It is not used for advertising.</p>
-            <h2>Analytics</h2>
-            <p>The site keeps a first-party count of page visits, stored as the page path and the date. No third-party analytics service is installed.</p>
-            <h2>Cookies</h2>
-            <p>A session cookie is used for the private admin area. The public site does not set advertising or tracking cookies.</p>
-          </>
-        )}
-        {kind === "disclaimer" && (
-          <>
-            <p>The material published on zamanadil.com is provided for academic, educational and informational purposes.</p>
-            <p>Research Reviews discuss and interpret published scholarly work and should not be treated as substitutes for consulting the original research.</p>
-            <p>Articles published in Opinion & Blogs may contain the analysis and interpretation of individual authors and do not necessarily represent the views of their affiliated institutions.</p>
-            <p>While reasonable efforts are made to ensure accuracy, readers are encouraged to consult original documents, datasets, publications and official sources where appropriate.</p>
-          </>
-        )}
-        {kind === "accessibility" && (
-          <>
-            <p>This website is intended to be readable and usable with a keyboard, a screen reader and on a small screen.</p>
-            <ul>
-              <li>a skip link to the main content;</li>
-              <li>one main heading on each page and a logical heading order;</li>
-              <li>visible focus styles for links, buttons and form fields;</li>
-              <li>labelled form fields and meaningful link text;</li>
-              <li>text alternatives for images;</li>
-              <li>colour contrast suitable for body text and navigation;</li>
-              <li>motion that can be reduced through the system setting for reduced motion;</li>
-              <li>a reading-language button on publications, research reviews and opinion. It opens a list of languages and can show a live translation. Type size sits on the reading page. The choice is kept in this browser.</li>
-            </ul>
-            <p>If you find a barrier, please use the contact form and describe the page and the problem.</p>
-          </>
-        )}
+      <header className="page-hero scene" data-scene="letters">
+        <div className="frame">
+          <p className="eyebrow"><span>Legal instrument</span></p>
+          <h1>{doc.title}</h1>
+          <p className="lede">{doc.description}</p>
+        </div>
+      </header>
+      <div className="frame page-pad">
+        <article className="deed" aria-labelledby="deed-title">
+          <header className="deed-head">
+            <div>
+              <p className="deed-kicker">zamanadil.com</p>
+              <p id="deed-title">{doc.title}</p>
+              <p>Dr. Adil Zaman</p>
+              <p>Department of Political Science and International Relations</p>
+              <p>University of Gujrat, Pakistan</p>
+            </div>
+            <dl className="deed-meta">
+              <div><dt>Document</dt><dd>{doc.ref}</dd></div>
+              <div><dt>Issued</dt><dd>{ISSUED}</dd></div>
+              <div><dt>Status</dt><dd>In force</dd></div>
+              <div><dt>Standing</dt><dd>Public notice. Correspondence under it is confidential.</dd></div>
+            </dl>
+          </header>
+          {doc.sections.map((section) => (
+            <section key={section.heading}>
+              <h2>{section.heading}</h2>
+              {section.paragraphs.map((paragraph) => <p key={paragraph}>{paragraph}</p>)}
+            </section>
+          ))}
+          <footer className="deed-sign">
+            <div className="stamp" aria-hidden="true">
+              <span>Dr. Adil Zaman</span>
+              <strong>Attested</strong>
+              <small>zamanadil.com · 2026</small>
+            </div>
+            <div>
+              <p className="sign-name">Dr. Adil Zaman</p>
+              <p>Political Scientist and Researcher</p>
+              <p>Proprietor of zamanadil.com</p>
+              <p>Attested on {ISSUED}, in a personal professional capacity. This instrument is not a seal or decision of the University of Gujrat.</p>
+            </div>
+          </footer>
+          <nav className="deed-related" aria-label="Related instruments">
+            {others.map(([href, label]) => <Link key={href} to={href}>{label}</Link>)}
+          </nav>
+        </article>
       </div>
     </article>
   );

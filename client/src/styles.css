@@ -115,8 +115,12 @@ main { min-width: 0; }
   text-decoration: none;
   color: var(--ink);
 }
-.masthead .lang-menu { flex: none; }
 .masthead .nav { margin-left: auto; }
+.reading-switch {
+  display: flex;
+  justify-content: flex-end;
+  margin: 0 0 0.85rem;
+}
 .brand span { min-width: 0; }
 .brand strong {
   display: block;
@@ -448,6 +452,104 @@ h4 { font-size: clamp(1.05rem, 1rem + 0.3vw, 1.2rem); }
   display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(0, 22rem); gap: clamp(1rem, 2vw, 1.4rem); align-items: start; padding-bottom: clamp(2.4rem, 5vw, 4rem);
 }
 .prose h2 { font-size: clamp(1.35rem, 1.15rem + 0.8vw, 1.7rem); margin: 1.8rem 0 0.5rem; }
+.deed {
+  max-width: 46rem;
+  padding: clamp(1.2rem, 2.5vw, 2rem);
+  border: 1px solid rgba(198, 163, 106, 0.45);
+  border-radius: 18px;
+  background:
+    linear-gradient(180deg, rgba(198, 163, 106, 0.08), transparent 8rem),
+    rgba(8, 12, 20, 0.72);
+}
+.deed-head {
+  display: grid;
+  grid-template-columns: minmax(0, 1.4fr) minmax(12rem, 0.8fr);
+  gap: 1.2rem 2rem;
+  padding-bottom: 1.1rem;
+  border-bottom: 1px solid var(--line);
+}
+.deed-kicker {
+  margin: 0 0 0.35rem;
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--gold);
+}
+.deed-head p { margin: 0.15rem 0; }
+.deed-head #deed-title {
+  margin: 0 0 0.45rem;
+  font-family: var(--serif);
+  font-size: clamp(1.35rem, 1.1rem + 0.8vw, 1.7rem);
+  color: var(--ink);
+}
+.deed-meta { margin: 0; display: grid; gap: 0.55rem; }
+.deed-meta div { margin: 0; }
+.deed-meta dt {
+  font-family: var(--mono);
+  font-size: 0.68rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--gold);
+}
+.deed-meta dd { margin: 0.15rem 0 0; }
+.deed h2 { font-size: clamp(1.2rem, 1.05rem + 0.5vw, 1.45rem); margin: 1.5rem 0 0.45rem; }
+.deed p { max-width: 65ch; }
+.deed-sign {
+  display: flex;
+  align-items: center;
+  gap: 1.4rem;
+  margin-top: 2rem;
+  padding-top: 1.2rem;
+  border-top: 1px solid var(--line);
+}
+.sign-name {
+  margin: 0 0 0.2rem;
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: 1.65rem;
+  color: var(--ink);
+}
+.stamp {
+  flex: none;
+  width: 7.4rem;
+  height: 7.4rem;
+  display: grid;
+  place-items: center;
+  align-content: center;
+  gap: 0.12rem;
+  border-radius: 50%;
+  border: 3px solid rgba(176, 58, 46, 0.85);
+  box-shadow: inset 0 0 0 2px rgba(176, 58, 46, 0.45), inset 0 0 0 6px rgba(176, 58, 46, 0.18);
+  color: rgba(196, 74, 60, 0.92);
+  text-align: center;
+  transform: rotate(-8deg);
+  background: rgba(176, 58, 46, 0.06);
+}
+.stamp span, .stamp strong, .stamp small { display: block; line-height: 1.15; }
+.stamp span {
+  font-family: var(--serif);
+  font-size: 0.78rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+.stamp strong {
+  font-size: 0.95rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+.stamp small { font-size: 0.62rem; letter-spacing: 0.04em; }
+.deed-related {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem 1rem;
+  margin-top: 1.2rem;
+}
+.deed-related a { display: inline-flex; align-items: center; min-height: 2.5rem; }
+@media (max-width: 720px) {
+  .deed-head, .deed-sign { grid-template-columns: 1fr; display: grid; }
+  .stamp { width: 6.4rem; height: 6.4rem; }
+}
 .prose p:has(.btn), .prose .actions { display: flex; flex-wrap: wrap; gap: 0.75rem 1rem; align-items: center; }
 .prose p { max-width: var(--measure); }
 .chips, .theme-list { display: flex; flex-wrap: wrap; gap: 0.45rem; padding: 0; margin: 0.8rem 0 0; list-style: none; }

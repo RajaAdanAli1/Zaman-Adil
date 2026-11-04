@@ -5,13 +5,17 @@ import {
   ORIGIN,
   PAGES,
   PROFILE,
+  alternateLocales,
   articleNode,
   breadcrumbNode,
   clip,
+  contentLanguages,
   documentTitle,
   itemListNode,
+  localeFor,
   pageGraph,
   scholarlyNode,
+  socialFields,
 } from "../../shared/seo.js";
 
 const ABOUT = [
@@ -37,10 +41,11 @@ export function headBlock(meta) {
   const title = documentTitle(meta.title);
   const description = clip(meta.description);
   const url = `${ORIGIN}${meta.path === "/" ? "/" : meta.path}`;
-  const image = meta.image && /^https?:\/\//i.test(meta.image) ? meta.image : `${ORIGIN}${meta.image || PROFILE.imagePath}`;
+  const image = socialFields(meta.image, meta.imageAlt);
   const robots = meta.robots || "index, follow";
-  const locale = meta.lang === "ur" ? "ur_PK" : "en_US";
-  return [
+  const locale = localeFor(meta.lang);
+  const alternates = alternateLocales(meta.lang, meta.languages);
+  const tags = [
     `<title>${escapeHtml(title)}</title>`,
     `<meta name="description" content="${escapeHtml(description)}" />`,
     `<meta name="author" content="${escapeHtml(PROFILE.name)}" />`,
@@ -51,14 +56,26 @@ export function headBlock(meta) {
     `<meta property="og:title" content="${escapeHtml(title)}" />`,
     `<meta property="og:description" content="${escapeHtml(description)}" />`,
     `<meta property="og:url" content="${escapeHtml(url)}" />`,
-    `<meta property="og:image" content="${escapeHtml(image)}" />`,
-    `<meta property="og:locale" content="${locale}" />`,
+    `<meta property="og:image" content="${escapeHtml(image.url)}" />`,
+  ];
+  if (image.secureUrl) tags.push(`<meta property="og:image:secure_url" content="${escapeHtml(image.secureUrl)}" />`);
+  if (image.type) tags.push(`<meta property="og:image:type" content="${escapeHtml(image.type)}" />`);
+  if (image.width) tags.push(`<meta property="og:image:width" content="${escapeHtml(image.width)}" />`);
+  if (image.height) tags.push(`<meta property="og:image:height" content="${escapeHtml(image.height)}" />`);
+  if (image.alt) tags.push(`<meta property="og:image:alt" content="${escapeHtml(image.alt)}" />`);
+  tags.push(`<meta property="og:locale" content="${locale}" />`);
+  for (const alternate of alternates) {
+    tags.push(`<meta property="og:locale:alternate" content="${escapeHtml(alternate)}" />`);
+  }
+  tags.push(
     `<meta name="twitter:card" content="summary_large_image" />`,
     `<meta name="twitter:title" content="${escapeHtml(title)}" />`,
     `<meta name="twitter:description" content="${escapeHtml(description)}" />`,
-    `<meta name="twitter:image" content="${escapeHtml(image)}" />`,
-    `<script type="application/ld+json" id="seo-jsonld">${jsonScript(meta.jsonLd)}</script>`,
-  ].join("\n    ");
+    `<meta name="twitter:image" content="${escapeHtml(image.url)}" />`,
+  );
+  if (image.alt) tags.push(`<meta name="twitter:image:alt" content="${escapeHtml(image.alt)}" />`);
+  tags.push(`<script type="application/ld+json" id="seo-jsonld">${jsonScript(meta.jsonLd)}</script>`);
+  return tags.join("\n    ");
 }
 
 function shell(main) {
@@ -94,11 +111,16 @@ function notFound(path) {
 }
 
 function ready({ status = 200, robotsHeader, lang = "en", meta, bootstrap, noscript }) {
+  const pageLang = meta.lang || lang;
   return {
     status,
     robotsHeader: robotsHeader || meta.robots || "index, follow",
-    lang,
-    meta: { ...meta, jsonLd: meta.jsonLd || pageGraph(meta) },
+    lang: pageLang,
+    meta: {
+      ...meta,
+      lang: pageLang,
+      jsonLd: meta.jsonLd || pageGraph({ ...meta, lang: pageLang }),
+    },
     bootstrap,
     noscript,
   };
@@ -226,11 +248,14 @@ async function publicationDocument(slug) {
     description,
     path,
     robots: "index, follow",
+    lang: item.lang === "ur" ? "ur" : "en",
     ogType: "article",
+    languages: contentLanguages(item.lang, item.alt?.lang),
     jsonLd: pageGraph({
       title: item.title,
       description,
       path,
+      lang: item.lang === "ur" ? "ur" : "en",
       extra: [
         scholarlyNode(item),
         breadcrumbNode([
@@ -298,12 +323,16 @@ async function articleDocument(slug, kind) {
     path,
     robots: "index, follow",
     image: article.image,
+    imageAlt: article.imageAlt || article.title,
     lang: article.lang === "ur" ? "ur" : "en",
+    languages: contentLanguages(article.lang, article.alt?.lang),
     ogType: "article",
     jsonLd: pageGraph({
       title: article.title,
       description,
       path,
+      lang: article.lang === "ur" ? "ur" : "en",
+      image: article.image,
       extra: [
         articleNode(article, path),
         breadcrumbNode([
@@ -371,26 +400,71 @@ function xml(value) {
   return escapeHtml(value);
 }
 
-export async function sitemapXml() {
-  const [publications, articles] = await Promise.all([
-    Publication.find().select("slug updatedAt").lean(),
-    Article.find({ published: true }).select("slug kind updatedAt").lean(),
-  ]);
-  const urls = [
-    ...Object.keys(PAGES).map((path) => ({ path, updated: null })),
-    ...publications.map((item) => ({ path: `/publications/${item.slug}`, updated: item.updatedAt })),
-    ...articles.map((item) => ({
-      path: `${item.kind === "review" ? "/research-reviews" : "/opinion-blogs"}/${item.slug}`,
-      updated: item.updatedAt,
-    })),
-  ];
-  const body = urls
-    .map((item) => {
-      const lastmod = item.updated ? `<lastmod>${new Date(item.updated).toISOString().slice(0, 10)}</lastmod>` : "";
-      return `<url><loc>${xml(`${ORIGIN}${item.path === "/" ? "/" : item.path}`)}</loc>${lastmod}</url>`;
+const SITEMAP_PAGES = "/sitemap-pages.xml";
+const SITEMAP_PUBLICATIONS = "/sitemap-publications.xml";
+const SITEMAP_WRITING = "/sitemap-writing.xml";
+
+function lastmodTag(value) {
+  if (!value) return "";
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return "";
+  return `<lastmod>${date.toISOString().slice(0, 10)}</lastmod>`;
+}
+
+function imageTags(images = []) {
+  return images
+    .filter((image) => image?.loc)
+    .map((image) => {
+      const title = image.title ? `<image:title>${xml(image.title)}</image:title>` : "";
+      const caption = image.caption ? `<image:caption>${xml(clip(image.caption, 200))}</image:caption>` : "";
+      return `<image:image><image:loc>${xml(image.loc)}</image:loc>${title}${caption}</image:image>`;
     })
     .join("");
-  return `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">${body}</urlset>\n`;
+}
+
+function urlset(entries) {
+  const images = entries.some((entry) => entry.images?.length);
+  const xmlns = images ? ` xmlns:image="http://www.google.com/schemas/sitemap-image/1.1"` : "";
+  const body = entries
+    .map((entry) => `<url><loc>${xml(entry.loc)}</loc>${lastmodTag(entry.updated)}${imageTags(entry.images)}</url>`)
+    .join("");
+  return `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"${xmlns}>${body}</urlset>\n`;
+}
+
+export function sitemapIndexXml() {
+  const maps = [SITEMAP_PAGES, SITEMAP_PUBLICATIONS, SITEMAP_WRITING];
+  const body = maps.map((path) => `<sitemap><loc>${xml(`${ORIGIN}${path}`)}</loc></sitemap>`).join("");
+  return `<?xml version="1.0" encoding="UTF-8"?>\n<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">${body}</sitemapindex>\n`;
+}
+
+export function pagesSitemapXml() {
+  return urlset(Object.keys(PAGES).map((path) => ({
+    loc: `${ORIGIN}${path === "/" ? "/" : path}`,
+    images: path === "/" || path === "/about"
+      ? [{ loc: `${ORIGIN}${PROFILE.imagePath}`, title: "Portrait of Dr. Adil Zaman" }]
+      : [],
+  })));
+}
+
+export async function publicationsSitemapXml() {
+  const items = await Publication.find().select("slug updatedAt title").lean();
+  return urlset(items.map((item) => ({
+    loc: `${ORIGIN}/publications/${item.slug}`,
+    updated: item.updatedAt,
+  })));
+}
+
+export async function writingSitemapXml() {
+  const items = await Article.find({ published: true }).select("slug kind updatedAt title image imageAlt").lean();
+  return urlset(items.map((item) => {
+    const base = item.kind === "review" ? "/research-reviews" : "/opinion-blogs";
+    const image = item.image ? [{ loc: item.image, title: item.title, caption: item.imageAlt || item.title }] : [];
+    return {
+      loc: `${ORIGIN}${base}/${item.slug}`,
+      updated: item.updatedAt,
+      images: image.map((picture) => ({ ...picture, loc: picture.loc.startsWith("http") ? picture.loc : `${ORIGIN}${picture.loc.startsWith("/") ? picture.loc : `/${picture.loc}`}` })),
+    };
+  }));
 }
 
 export function robotsTxt() {
@@ -399,6 +473,7 @@ export function robotsTxt() {
     "Allow: /",
     "Disallow: /admin",
     "Disallow: /search",
+    "Disallow: /api",
     "",
     `Sitemap: ${ORIGIN}/sitemap.xml`,
     "",

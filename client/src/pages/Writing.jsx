@@ -4,7 +4,9 @@ import { api, formatDate } from "../api";
 import { bareDoi, doiUrl, safeHref } from "../../../shared/links.js";
 import { usePage } from "../components/Chrome";
 import { StoryCard } from "../components/Cards";
+import { LanguageMenu } from "../components/LanguageMenu";
 import { ReadingBar } from "../components/ReadingBar";
+import { contentLanguages } from "../../../shared/seo.js";
 import { articleNode, breadcrumbNode, itemListNode, readBootstrap } from "../seo";
 import { categoryLabel, dirFor, readingMinutes, selectEdition, textLang } from "../../../shared/reading.js";
 import { LiveText, useLiveText } from "../components/LiveText";
@@ -39,6 +41,7 @@ export function Archive({ kind }) {
     <article>
       <header className="page-hero scene" data-scene={isReview ? "reading" : "editorial"} lang={reading.lang} dir={reading.dir}>
         <div className="frame">
+          <div className="reading-switch"><LanguageMenu align="end" /></div>
           <p className="eyebrow"><span>{isReview ? t.reviewsEyebrow : t.commentary}</span></p>
           <h1>{isReview ? t.reviews : t.opinion}</h1>
           <p className="lede">{isReview ? t.reviewLede : t.opinionLede}</p>
@@ -141,7 +144,9 @@ export function ArticlePage({ kind }) {
       ? {
           ogType: "article",
           image: article.image,
+          imageAlt: article.imageAlt || edition.title,
           lang: edition.lang,
+          languages: contentLanguages(article.lang, article.alt?.lang),
           jsonLd: [
             articleNode({ ...article, title: edition.title, excerpt: edition.excerpt || article.excerpt, lang: edition.lang }, `${base}/${article.slug}`),
             breadcrumbNode([
@@ -217,6 +222,7 @@ export function ArticlePage({ kind }) {
       <header className="page-hero scene essay-hero" data-scene={kind === "review" ? "reading" : "editorial"}>
         <div className="frame">
           <div className={`essay-intro${urdu ? " is-urdu" : ""}`}>
+          <div className="reading-switch"><LanguageMenu align="end" /></div>
           <ReadingBar />
           <p className="breadcrumb" lang={reading.lang} dir={reading.dir}><Link to="/">{t.home}</Link> / <Link to={base}>{label}</Link></p>
           <p className="kicker"><LiveText text={category} source={textLang(category)} /></p>

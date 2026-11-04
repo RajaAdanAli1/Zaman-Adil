@@ -48,6 +48,7 @@ export function presentPublication(doc) {
     link,
     lang: item.lang === "ur" ? "ur" : "en",
     alt: presentAlt(item.alt, true),
+    ...(item.updatedAt ? { updatedAt: new Date(item.updatedAt).toISOString() } : {}),
   };
 }
 
@@ -66,6 +67,7 @@ export function presentArticle(doc, full = false) {
     imageAlt: item.imageAlt || "",
     author: item.author,
     lang,
+    ...(item.updatedAt ? { updatedAt: new Date(item.updatedAt).toISOString() } : {}),
     excerpt: excerptSource.slice(0, 220).trim(),
     readingMinutes: readingMinutes({ lang, paragraphs: item.paragraphs, sections: item.sections }),
     alt: presentAlt(item.alt, full, { article: true }),
