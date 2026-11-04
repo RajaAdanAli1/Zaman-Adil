@@ -166,7 +166,7 @@ function Shell() {
       {menuOpen && <button className="desk-scrim" type="button" aria-label="Close menu" onClick={() => setMenuOpen(false)} />}
       <aside className="desk-side" id="desk-nav" ref={sideRef}>
         <div className="desk-brand">
-          <img src="/media/logo.png" alt="" />
+          <img src="/media/logo.jpg" alt="" />
           <div>
             <strong>Research desk</strong>
             <small>Dr. Adil Zaman</small>
@@ -230,7 +230,7 @@ function Login() {
   return (
     <div className="login-wrap">
       <form className="login-card contact-form" onSubmit={submit}>
-        <img className="login-seal" src="/media/logo.png" alt="" />
+        <img className="login-seal" src="/media/logo.jpg" alt="" />
         <p className="kicker">Private</p>
         <h1>Research desk</h1>
         <p className="support">Sign in to manage publications, writing and enquiries.</p>
@@ -270,7 +270,7 @@ function ForcePassword({ onChanged }) {
   return (
     <div className="login-wrap">
       <form className="login-card contact-form" onSubmit={submit}>
-        <img className="login-seal" src="/media/logo.png" alt="" />
+        <img className="login-seal" src="/media/logo.jpg" alt="" />
         <p className="kicker">Required</p>
         <h1>Set a new password</h1>
         <p className="support">This desk is still using a temporary password. Choose a private one before the archive opens.</p>

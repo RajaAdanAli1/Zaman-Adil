@@ -110,7 +110,7 @@ function notFound(path) {
   };
 }
 
-function ready({ status = 200, robotsHeader, lang = "en", meta, bootstrap, noscript }) {
+function ready({ status = 200, robotsHeader, lang = "en", meta, bootstrap, noscript, preload = [] }) {
   const pageLang = meta.lang || lang;
   return {
     status,
@@ -123,6 +123,7 @@ function ready({ status = 200, robotsHeader, lang = "en", meta, bootstrap, noscr
     },
     bootstrap,
     noscript,
+    preload,
   };
 }
 
@@ -208,6 +209,10 @@ async function homeDocument() {
     meta: { ...page, path: "/" },
     bootstrap: data,
     noscript: shell(main),
+    preload: [
+      { as: "image", href: "/media/bg-chamber.jpg", fetchpriority: "high" },
+      { as: "image", href: "/media/portrait.jpg", fetchpriority: "high" },
+    ],
   });
 }
 
@@ -393,6 +398,10 @@ export function applyTemplate(template, document) {
   if (html.includes("<!--seo-noscript-->")) {
     html = html.replace("<!--seo-noscript-->", noscript);
   }
+  const preload = (document.preload || [])
+    .map((item) => `<link rel="preload" as="${escapeHtml(item.as)}" href="${escapeHtml(item.href)}"${item.fetchpriority ? ` fetchpriority="${escapeHtml(item.fetchpriority)}"` : ""} />`)
+    .join("\n    ");
+  html = html.replace("<!--preload-->", preload);
   return html;
 }
 

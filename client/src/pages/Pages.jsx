@@ -14,7 +14,7 @@ export function About() {
   usePage("About", "Dr. Adil Zaman is a political scientist, researcher and academic specialising in elections, political behaviour, democratic institutions and South Asian politics.");
   return (
     <article>
-      <header className="page-hero scene" data-scene="university">
+      <header className="page-hero scene is-ready" data-scene="university">
         <div className="frame">
           <p className="eyebrow"><span>Profile</span></p>
           <h1>About Dr. Adil Zaman</h1>
@@ -46,7 +46,7 @@ export function About() {
         </div>
         <aside className="sticky">
           <figure className="portrait compact">
-            <img src="/media/portrait.png" alt="Portrait of Dr. Adil Zaman" />
+            <img src="/media/portrait.jpg" alt="Portrait of Dr. Adil Zaman" decoding="async" />
             <figcaption>Dr. Adil Zaman</figcaption>
           </figure>
           <div className="aside-card">
@@ -65,7 +65,7 @@ export function Expertise() {
   usePage("Research Expertise", "Research expertise in elections, voting behaviour, political participation, Pakistan politics, South Asia, parliament and quantitative political research.");
   return (
     <article>
-      <header className="page-hero scene" data-scene="chamber">
+      <header className="page-hero scene is-ready" data-scene="chamber">
         <div className="frame">
           <p className="eyebrow"><span>Expertise</span></p>
           <h1>Research Expertise</h1>
@@ -93,7 +93,7 @@ export function Services() {
   return (
     <>
       <article>
-        <header className="page-hero scene" data-scene="seminar">
+        <header className="page-hero scene is-ready" data-scene="seminar">
           <div className="frame">
             <p className="eyebrow"><span>Services</span></p>
             <h1>Research & Academic Services</h1>
@@ -118,7 +118,7 @@ export function Services() {
           </section>
         </div>
       </article>
-      <section className="cta scene" data-scene="letters">
+      <section className="cta scene is-ready" data-scene="letters">
         <div className="frame">
           <div className="gold-rule" />
           <h2>Discuss a research requirement</h2>
@@ -201,7 +201,7 @@ export function Contact() {
 
   return (
     <article>
-      <header className="page-hero scene" data-scene="letters">
+      <header className="page-hero scene is-ready" data-scene="letters">
         <div className="frame">
           <p className="eyebrow"><span>Correspondence</span></p>
           <h1>Contact</h1>
@@ -271,7 +271,7 @@ export function SearchPage() {
 
   return (
     <article>
-      <header className="page-hero scene" data-scene="journals">
+      <header className="page-hero scene is-ready" data-scene="journals">
         <div className="frame">
           <h1>Search</h1>
           <form className="search-bar" onSubmit={(event) => { event.preventDefault(); }}>
@@ -324,7 +324,7 @@ export function Legal({ kind }) {
   ].filter(([href]) => href !== `/${kind}`);
   return (
     <article>
-      <header className="page-hero scene" data-scene="letters">
+      <header className="page-hero scene is-ready" data-scene="letters">
         <div className="frame">
           <p className="eyebrow"><span>Legal instrument</span></p>
           <h1>{doc.title}</h1>

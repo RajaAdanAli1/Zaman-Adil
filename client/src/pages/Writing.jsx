@@ -39,7 +39,7 @@ export function Archive({ kind }) {
 
   return (
     <article>
-      <header className="page-hero scene" data-scene={isReview ? "reading" : "editorial"} lang={reading.lang} dir={reading.dir}>
+      <header className="page-hero scene is-ready" data-scene={isReview ? "reading" : "editorial"} lang={reading.lang} dir={reading.dir}>
         <div className="frame">
           <div className="reading-switch"><LanguageMenu align="end" /></div>
           <p className="eyebrow"><span>{isReview ? t.reviewsEyebrow : t.commentary}</span></p>
@@ -113,7 +113,7 @@ function ArticleFigure({ article, urdu }) {
   }
   return (
     <figure className={`essay-figure${urdu ? " is-urdu" : ""}`}>
-      <img src={image} alt={article.imageAlt || article.title} onError={() => setFailed(true)} />
+      <img src={image} alt={article.imageAlt || article.title} decoding="async" onError={() => setFailed(true)} />
       {article.imageAlt && <figcaption>{article.imageAlt}</figcaption>}
     </figure>
   );
@@ -219,7 +219,7 @@ export function ArticlePage({ kind }) {
   return (
     <article className={`essay${hasSide ? " has-side" : ""}${urdu ? " is-urdu" : ""}${rtl ? " is-rtl" : ""}`} lang={reading.lang} dir={reading.dir}>
       <div className="progress" style={{ width: `${progress}%` }} />
-      <header className="page-hero scene essay-hero" data-scene={kind === "review" ? "reading" : "editorial"}>
+      <header className="page-hero scene is-ready essay-hero" data-scene={kind === "review" ? "reading" : "editorial"}>
         <div className="frame">
           <div className={`essay-intro${urdu ? " is-urdu" : ""}`}>
           <div className="reading-switch"><LanguageMenu align="end" /></div>

@@ -54,7 +54,7 @@ export default function Home() {
 
   return (
     <>
-      <section className="hero scene" data-scene="chamber">
+      <section className="hero scene is-ready" data-scene="chamber">
         <div className="hero-stage">
           <div className="hero-intro">
             <p className="eyebrow">
@@ -66,7 +66,7 @@ export default function Home() {
             <p className="hero-post">University of Gujrat</p>
           </div>
           <figure className="hero-portrait">
-            <img src="/media/portrait.png" alt="Portrait of Dr. Adil Zaman" />
+            <img src="/media/portrait.jpg" alt="Portrait of Dr. Adil Zaman" fetchPriority="high" decoding="async" />
             <figcaption>
               <strong>Dr. Adil Zaman</strong>
               <span>Political Science &amp; International Relations</span>

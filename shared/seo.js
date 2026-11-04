@@ -17,7 +17,7 @@ export const PROFILE = {
   department: "Department of Political Science and International Relations",
   description:
     "Dr. Adil Zaman researches elections, political behaviour, democratic institutions and the changing politics of Pakistan and South Asia.",
-  imagePath: "/media/portrait.png",
+  imagePath: "/media/portrait.jpg",
   knowsAbout: [
     "Elections",
     "Electoral integrity",

@@ -83,6 +83,14 @@ export function createApp() {
 
   if (fs.existsSync(clientIndex)) {
     const production = process.env.NODE_ENV === "production";
+    let templateCache = { mtime: 0, html: "" };
+    function readTemplate() {
+      const mtime = fs.statSync(clientIndex).mtimeMs;
+      if (mtime !== templateCache.mtime) {
+        templateCache = { mtime, html: fs.readFileSync(clientIndex, "utf8") };
+      }
+      return templateCache.html;
+    }
     app.use(express.static(clientDist, {
       index: false,
       dotfiles: "ignore",
@@ -96,6 +104,10 @@ export function createApp() {
         }
         if (filePath.split(path.sep).includes("assets")) {
           res.setHeader("Cache-Control", "public, max-age=31536000, immutable");
+          return;
+        }
+        if (filePath.split(path.sep).includes("media") || filePath.endsWith(".svg") || filePath.endsWith(".pdf")) {
+          res.setHeader("Cache-Control", "public, max-age=604800");
         }
       },
     }));
@@ -107,7 +119,7 @@ export function createApp() {
           return res.redirect(301, req.path.replace(/\/+$/, "") || "/");
         }
         if (path.extname(req.path)) return res.status(404).end();
-        const template = fs.readFileSync(clientIndex, "utf8");
+        const template = readTemplate();
         const document = await resolveDocument(req.path);
         if (document.robotsHeader) res.setHeader("X-Robots-Tag", document.robotsHeader);
         res.setHeader("Cache-Control", "no-cache");

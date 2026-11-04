@@ -76,7 +76,7 @@ function Cover({ article }) {
       </span>
     );
   }
-  return <img src={image} alt={article.imageAlt || article.title} onError={() => setFailed(true)} />;
+  return <img src={image} alt={article.imageAlt || article.title} loading="lazy" decoding="async" onError={() => setFailed(true)} />;
 }
 
 function tilt(event) {

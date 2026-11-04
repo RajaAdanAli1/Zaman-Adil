@@ -1,5 +1,6 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
 import { copy, dirFor, readingCode, ui } from "../../shared/reading.js";
+import { loadScriptFont } from "./fonts";
 import { beginLanguage, subscribeTranslation, translateMany } from "./translate";
 
 const LANG_KEY = "za-reading-lang";
@@ -53,6 +54,10 @@ export function ReadingProvider({ children }) {
   const [activity, setActivity] = useState({ pending: false, failed: "" });
 
   useEffect(() => subscribeTranslation(setActivity), []);
+
+  useEffect(() => {
+    loadScriptFont(lang);
+  }, [lang]);
 
   useEffect(() => {
     function onStorage(event) {

@@ -9,7 +9,7 @@ import { ReadingProvider, useReading } from "../reading";
 export function Seal() {
   return (
     <span className="seal">
-      <img src="/media/logo.png" alt="" />
+      <img src="/media/logo.jpg" alt="" decoding="async" />
     </span>
   );
 }
@@ -68,6 +68,20 @@ function SiteChrome({ children }) {
     window.scrollTo(0, 0);
     api("/api/track", { method: "POST", body: { path: location.pathname } }).catch(() => {});
   }, [location.pathname, reading.setOpenMenu]);
+
+  useEffect(() => {
+    const nodes = document.querySelectorAll(".scene[data-scene]:not(.is-ready)");
+    if (!nodes.length) return undefined;
+    const observer = new IntersectionObserver((entries) => {
+      for (const entry of entries) {
+        if (!entry.isIntersecting) continue;
+        entry.target.classList.add("is-ready");
+        observer.unobserve(entry.target);
+      }
+    }, { rootMargin: "280px 0px" });
+    nodes.forEach((node) => observer.observe(node));
+    return () => observer.disconnect();
+  }, [location.pathname]);
 
   useEffect(() => {
     document.body.classList.toggle("overlay-open", open || searchOpen);

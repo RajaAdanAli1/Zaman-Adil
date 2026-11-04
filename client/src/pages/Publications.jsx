@@ -51,7 +51,7 @@ export default function Publications() {
 
   return (
     <article>
-      <header className="page-hero scene" data-scene="journals" lang={reading.lang} dir={reading.dir}>
+      <header className="page-hero scene is-ready" data-scene="journals" lang={reading.lang} dir={reading.dir}>
         <div className="frame">
           <div className="reading-switch"><LanguageMenu align="end" /></div>
           <p className="eyebrow"><span>{t.archive}</span></p>
@@ -174,7 +174,7 @@ export function PublicationPage() {
   const source = safeHref(item.link) || safeHref(item.url) || doiUrl(item.doi);
   return (
     <article>
-      <header className="page-hero scene" data-scene="journals">
+      <header className="page-hero scene is-ready" data-scene="journals">
         <div className="frame">
           <div className="reading-switch"><LanguageMenu align="end" /></div>
           <ReadingBar />
