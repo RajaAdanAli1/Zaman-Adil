@@ -15,15 +15,27 @@ if (process.env.NODE_ENV !== "test" && process.env.NODE_ENV !== "production") {
   dotenv.config({ path: path.join(__dirname, "..", ".env") });
 }
 
+export function parseListenPort(value) {
+  const raw = String(value ?? "").trim().replace(/^['"]|['"]$/g, "");
+  if (!raw) return { port: null };
+  const match = /^(?:(?:https?:\/\/)?(?:\[[^\]]+\]|[^:/\s]+):)?(\d{1,5})$/.exec(raw);
+  const port = match ? Number(match[1]) : NaN;
+  if (!Number.isInteger(port) || port < 1 || port > 65535) return { port: null, invalid: raw.slice(0, 80) };
+  return { port };
+}
+
 export function listenConfig() {
-  const rawPort = (process.env.PORT ?? "").trim();
   const host = (process.env.HOST ?? "").trim() || "0.0.0.0";
-  const port = rawPort === "" ? NaN : Number(rawPort);
-  const valid = Number.isInteger(port) && port >= 1 && port <= 65535;
-  if (process.env.NODE_ENV === "production" && !valid) {
-    throw new Error("PORT must be an integer from 1 to 65535. The hosting platform sets this value.");
+  const parsed = parseListenPort(process.env.PORT);
+  if (parsed.invalid) {
+    throw new Error(`PORT must be an integer from 1 to 65535, or a host:port value. Received ${JSON.stringify(parsed.invalid)}.`);
   }
-  return { port: valid ? port : 5000, host };
+  if (parsed.port) return { port: parsed.port, host };
+  if (process.env.NODE_ENV === "production") {
+    console.warn("PORT is empty. Listening on 3000. Delete a blank PORT row in the host panel so the platform can assign the port.");
+    return { port: 3000, host };
+  }
+  return { port: 5000, host };
 }
 
 export function assertProductionBuild() {

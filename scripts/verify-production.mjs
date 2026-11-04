@@ -141,8 +141,27 @@ async function main() {
   const noJwt = await runUntilExit(childEnv({ PORT: "4321", MONGODB_URI: "mongodb://127.0.0.1:1/zamanadil_verify" }));
   check("missing JWT_SECRET fails startup", noJwt.code === 1 && noJwt.out.includes("JWT_SECRET"), noJwt.out.slice(0, 300));
 
+  const savedPort = process.env.PORT;
+  process.env.PORT = "";
+  check("blank PORT uses 3000", listenConfig().port === 3000);
+  process.env.PORT = "127.0.0.1:3210";
+  check("host:port value is accepted", listenConfig().port === 3210);
+  let rejected = false;
+  process.env.PORT = "not-a-port";
+  try {
+    listenConfig();
+  } catch (error) {
+    rejected = error.message.includes("not-a-port");
+  }
+  check("a non-numeric PORT is rejected", rejected);
+  process.env.PORT = savedPort;
+
   const noPort = await runUntilExit(childEnv({ JWT_SECRET: jwt, MONGODB_URI: "mongodb://127.0.0.1:1/zamanadil_verify" }));
-  check("missing PORT fails startup", noPort.code === 1 && noPort.out.includes("PORT"), noPort.out.slice(0, 300));
+  check(
+    "missing PORT does not crash on the port check",
+    noPort.code === 1 && noPort.out.includes("PORT is empty") && !noPort.out.includes("must be an integer"),
+    noPort.out.slice(0, 300),
+  );
 
   const noDb = await runUntilExit(childEnv({ JWT_SECRET: jwt, PORT: "4321" }));
   check(

@@ -47,7 +47,7 @@ Do not add these. The process already has the right behaviour when they are abse
 
 | Key | Why it stays unset |
 | --- | --- |
-| `PORT` | Hostinger sets it. The process reads `process.env.PORT` and listens on `0.0.0.0`. |
+| `PORT` | Do not add this row. Hostinger assigns it, and the process listens on `0.0.0.0`. A blank `PORT` row overrides that assignment. Delete the row if it is present. |
 | `HOST` | Defaults to `0.0.0.0`. |
 | `TRUST_PROXY` | Production trusts one proxy hop, which matches Hostinger. |
 | `CLIENT_ORIGIN` | The site and the API share one origin. `*` is ignored. |
