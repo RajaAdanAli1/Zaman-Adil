@@ -1,10 +1,11 @@
 export const nav = [
   ["/", "Home"],
   ["/about", "About"],
+  ["/opinion-blogs", "Opinion & Blogs"],
   ["/expertise", "Expertise"],
   ["/publications", "Publications"],
+  ["/current-projects", "Current Projects"],
   ["/research-reviews", "Research Reviews"],
-  ["/opinion-blogs", "Opinion & Blogs"],
   ["/services", "Services"],
   ["/contact", "Contact"],
 ];

@@ -1,10 +1,10 @@
 import { Router } from "express";
 import bcrypt from "bcryptjs";
-import { Article, Message, Pageview, Publication, User } from "../models.js";
+import { Article, Comment, Message, Pageview, Project, Publication, User } from "../models.js";
 import { clearSession, requireAdmin, revokeSession, setSession, signSession, verifyPassword, COOKIE } from "../auth.js";
 import { clearLimit, limitStatus, recordLimit } from "../limit.js";
 import { clientAddress, hashAddress } from "../security.js";
-import { articleFrom, objectId, publicationFrom } from "../validate.js";
+import { articleFrom, objectId, projectFrom, publicationFrom } from "../validate.js";
 
 const router = Router();
 const LOGIN_WINDOW = 10 * 60 * 1000;
@@ -102,10 +102,12 @@ const missingLink = {
 
 router.get("/stats", requireDesk, async (_req, res, next) => {
   try {
-    const [publications, reviews, opinions, unread, views, messages, pages, missing, recent] = await Promise.all([
+    const [publications, reviews, opinions, projects, comments, unread, views, messages, pages, missing, recent] = await Promise.all([
       Publication.countDocuments(),
       Article.countDocuments({ kind: "review" }),
       Article.countDocuments({ kind: "opinion" }),
+      Project.countDocuments(),
+      Comment.countDocuments(),
       Message.countDocuments({ isRead: false }),
       Pageview.aggregate([{ $group: { _id: null, total: { $sum: "$views" } } }]),
       Message.find().sort({ createdAt: -1 }).limit(5).select("name email enquiry subject isRead createdAt"),
@@ -121,6 +123,8 @@ router.get("/stats", requireDesk, async (_req, res, next) => {
       publications,
       reviews,
       opinions,
+      projects,
+      comments,
       unread,
       views: views[0]?.total || 0,
       messages: messages.map((item) => messageView(item)),
@@ -217,6 +221,83 @@ router.delete("/articles/:id", requireDesk, async (req, res, next) => {
     if (!id) return res.status(400).json({ error: "That record could not be found." });
     const item = await Article.findByIdAndDelete(id);
     if (!item) return res.status(404).json({ error: "Article not found." });
+    res.json({ ok: true });
+  } catch (error) {
+    next(error);
+  }
+});
+
+router.get("/projects", requireDesk, async (_req, res, next) => {
+  try {
+    res.json(await Project.find().sort({ sortOrder: 1, updatedAt: -1 }).limit(2000));
+  } catch (error) {
+    next(error);
+  }
+});
+
+router.post("/projects", requireDesk, async (req, res, next) => {
+  try {
+    const parsed = projectFrom(req.body);
+    if (parsed.error) return res.status(400).json({ error: parsed.error });
+    const item = await Project.create(parsed.value);
+    res.status(201).json(item);
+  } catch (error) {
+    next(error);
+  }
+});
+
+router.put("/projects/:id", requireDesk, async (req, res, next) => {
+  try {
+    const id = objectId(req.params.id);
+    if (!id) return res.status(400).json({ error: "That record could not be found." });
+    const parsed = projectFrom(req.body, { partial: true });
+    if (parsed.error) return res.status(400).json({ error: parsed.error });
+    const item = await Project.findByIdAndUpdate(id, parsed.value, { new: true, runValidators: true });
+    if (!item) return res.status(404).json({ error: "Project not found." });
+    res.json(item);
+  } catch (error) {
+    next(error);
+  }
+});
+
+router.delete("/projects/:id", requireDesk, async (req, res, next) => {
+  try {
+    const id = objectId(req.params.id);
+    if (!id) return res.status(400).json({ error: "That record could not be found." });
+    const item = await Project.findByIdAndDelete(id);
+    if (!item) return res.status(404).json({ error: "Project not found." });
+    res.json({ ok: true });
+  } catch (error) {
+    next(error);
+  }
+});
+
+router.get("/comments", requireDesk, async (_req, res, next) => {
+  try {
+    const items = await Comment.find().sort({ createdAt: -1 }).limit(1000).select("-ipHash");
+    res.json(items.map((item) => {
+      const doc = item.toObject ? item.toObject() : item;
+      return {
+        _id: doc._id,
+        name: doc.name,
+        email: doc.email || "",
+        body: doc.body,
+        articleSlug: doc.articleSlug,
+        articleKind: doc.articleKind,
+        createdAt: doc.createdAt,
+      };
+    }));
+  } catch (error) {
+    next(error);
+  }
+});
+
+router.delete("/comments/:id", requireDesk, async (req, res, next) => {
+  try {
+    const id = objectId(req.params.id);
+    if (!id) return res.status(400).json({ error: "That record could not be found." });
+    const item = await Comment.findByIdAndDelete(id);
+    if (!item) return res.status(404).json({ error: "Comment not found." });
     res.json({ ok: true });
   } catch (error) {
     next(error);

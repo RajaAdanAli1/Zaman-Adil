@@ -24,7 +24,7 @@ function untilt(event) {
   event.currentTarget.style.transform = "";
 }
 
-const emptyHome = { featured: [], reviews: [], opinions: [] };
+const emptyHome = { featured: [], reviews: [], opinions: [], projects: [] };
 
 export default function Home() {
   const reading = useReading();
@@ -44,6 +44,7 @@ export default function Home() {
         featured: Array.isArray(payload?.featured) ? payload.featured : [],
         reviews: Array.isArray(payload?.reviews) ? payload.reviews : [],
         opinions: Array.isArray(payload?.opinions) ? payload.opinions : [],
+        projects: Array.isArray(payload?.projects) ? payload.projects : [],
       }))
       .catch(() => setData(emptyHome));
   }, []);
@@ -51,6 +52,7 @@ export default function Home() {
   const featured = data?.featured || [];
   const reviews = data?.reviews || [];
   const opinions = data?.opinions || [];
+  const projects = data?.projects || [];
 
   return (
     <>
@@ -83,10 +85,25 @@ export default function Home() {
         </div>
       </section>
 
+      <section className="band scene" data-scene="editorial" aria-labelledby="opinion-heading">
+        <div className="frame">
+          <header className="section-head" lang={reading.lang} dir={reading.dir}>
+            <p className="index">01</p>
+            <h2 id="opinion-heading">{t.opinion}</h2>
+            <p>{t.homeOpinion}</p>
+            <ReadingBar />
+          </header>
+          <div className="story-grid">
+            {opinions.map((article) => <StoryCard key={article.slug} article={article} kind="opinion" />)}
+          </div>
+          <p className="section-action"><Link className="btn line" to="/opinion-blogs" lang={reading.lang !== "en" ? reading.lang : undefined}>{t.viewOpinion}</Link></p>
+        </div>
+      </section>
+
       <section className="band scene" data-scene="elections" aria-labelledby="areas-heading">
         <div className="frame">
           <header className="section-head">
-            <p className="index">01</p>
+            <p className="index">02</p>
             <h2 id="areas-heading">Research Areas</h2>
           </header>
           <div className="area-grid">
@@ -105,7 +122,7 @@ export default function Home() {
       <section className="band scene" data-scene="journals" aria-labelledby="featured-heading">
         <div className="frame">
           <header className="section-head" lang={reading.lang} dir={reading.dir}>
-            <p className="index">02</p>
+            <p className="index">03</p>
             <h2 id="featured-heading">{t.featured}</h2>
             <p>{t.homeFeatured}</p>
             <ReadingBar />
@@ -117,10 +134,31 @@ export default function Home() {
         </div>
       </section>
 
+      {!!projects.length && (
+        <section className="band scene" data-scene="seminar" aria-labelledby="projects-heading">
+          <div className="frame">
+            <header className="section-head" lang={reading.lang} dir={reading.dir}>
+              <p className="index">04</p>
+              <h2 id="projects-heading">{t.projects}</h2>
+              <p>{t.homeProjects}</p>
+            </header>
+            <div className="project-list">
+              {projects.map((item) => (
+                <article className="project-card" key={item.id}>
+                  <h3>{item.title}</h3>
+                  <p>{item.description}</p>
+                </article>
+              ))}
+            </div>
+            <p className="section-action"><Link className="btn line" to="/current-projects" lang={reading.lang !== "en" ? reading.lang : undefined}>{t.viewProjects}</Link></p>
+          </div>
+        </section>
+      )}
+
       <section className="band scene" data-scene="reading" aria-labelledby="reviews-heading">
         <div className="frame">
           <header className="section-head" lang={reading.lang} dir={reading.dir}>
-            <p className="index">03</p>
+            <p className="index">{projects.length ? "05" : "04"}</p>
             <h2 id="reviews-heading">{t.reviews}</h2>
             <p>{t.homeReviews}</p>
             <ReadingBar />
@@ -132,25 +170,10 @@ export default function Home() {
         </div>
       </section>
 
-      <section className="band scene" data-scene="editorial" aria-labelledby="opinion-heading">
-        <div className="frame">
-          <header className="section-head" lang={reading.lang} dir={reading.dir}>
-            <p className="index">04</p>
-            <h2 id="opinion-heading">{t.opinion}</h2>
-            <p>{t.homeOpinion}</p>
-            <ReadingBar />
-          </header>
-          <div className="story-grid">
-            {opinions.map((article) => <StoryCard key={article.slug} article={article} kind="opinion" />)}
-          </div>
-          <p className="section-action"><Link className="btn line" to="/opinion-blogs" lang={reading.lang !== "en" ? reading.lang : undefined}>{t.viewOpinion}</Link></p>
-        </div>
-      </section>
-
       <section className="band scene" data-scene="seminar" aria-labelledby="services-heading">
         <div className="frame">
           <header className="section-head">
-            <p className="index">05</p>
+            <p className="index">{projects.length ? "06" : "05"}</p>
             <h2 id="services-heading">Research & Academic Services</h2>
             <p>Research support and academic consultancy for researchers, postgraduate students, academic institutions and organisations.</p>
           </header>

@@ -1835,6 +1835,112 @@ td, th { overflow-wrap: break-word; }
 @media (pointer: coarse) {
   .btn.small, .filters button, .filters a, .desk-tools button { min-height: 2.75rem; }
 }
+.share-box {
+  margin: 2rem 0 0;
+  padding-top: 1.2rem;
+  border-top: 1px solid var(--line);
+}
+.share-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.55rem;
+  margin-top: 0.7rem;
+}
+.share-links a,
+.share-links button {
+  appearance: none;
+  border: 1px solid var(--line);
+  background: rgba(255, 255, 255, 0.03);
+  color: var(--ink);
+  font: inherit;
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  text-decoration: none;
+  padding: 0.55rem 0.75rem;
+  border-radius: 999px;
+  cursor: pointer;
+}
+.share-links a:hover,
+.share-links button:hover {
+  border-color: rgba(228, 201, 138, 0.55);
+  color: var(--gold-2);
+}
+.comments {
+  margin: 2.4rem 0 0;
+  padding-top: 1.4rem;
+  border-top: 1px solid var(--line);
+  width: min(100%, var(--measure));
+}
+.comments-head h2 {
+  margin: 0.2rem 0 0.8rem;
+  font-size: clamp(1.6rem, 1.2rem + 1.2vw, 2.1rem);
+}
+.comment-list {
+  list-style: none;
+  margin: 0 0 1.4rem;
+  padding: 0;
+  display: grid;
+  gap: 1rem;
+}
+.comment-list li {
+  padding: 0.95rem 0;
+  border-bottom: 1px solid var(--line);
+}
+.comment-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem 0.85rem;
+  margin: 0 0 0.45rem;
+  color: var(--muted);
+  font-family: var(--mono);
+  font-size: 0.74rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+.comment-meta strong {
+  color: var(--ink);
+  font-family: var(--serif);
+  font-size: 1rem;
+  letter-spacing: 0;
+  text-transform: none;
+}
+.comment-body {
+  margin: 0;
+  color: var(--text);
+  line-height: 1.65;
+  white-space: pre-wrap;
+}
+.comment-form { margin-top: 0.4rem; }
+.field.honey {
+  position: absolute;
+  left: -10000px;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+}
+.project-list {
+  display: grid;
+  gap: 0.9rem;
+}
+.project-card {
+  padding: 1.15rem 1.2rem 1.25rem;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.03);
+}
+.project-card h2,
+.project-card h3 {
+  margin: 0 0 0.45rem;
+  font-size: clamp(1.25rem, 1.05rem + 0.7vw, 1.55rem);
+}
+.project-card p {
+  margin: 0;
+  color: var(--muted);
+  line-height: 1.65;
+  white-space: pre-wrap;
+}
 .server-fallback {
   max-width: var(--measure);
   margin: 0 auto;

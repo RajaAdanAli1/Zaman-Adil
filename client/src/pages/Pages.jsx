@@ -88,6 +88,47 @@ export function Expertise() {
   );
 }
 
+export function Projects() {
+  const reading = useReading();
+  const { t } = reading;
+  const [items, setItems] = useState(null);
+  usePage(t.projects, t.projectsMeta, { lang: reading.lang });
+
+  useEffect(() => {
+    api("/api/projects")
+      .then((payload) => setItems(Array.isArray(payload?.items) ? payload.items : []))
+      .catch(() => setItems([]));
+  }, []);
+
+  return (
+    <article>
+      <header className="page-hero scene is-ready" data-scene="seminar" lang={reading.lang} dir={reading.dir}>
+        <div className="frame">
+          <p className="eyebrow"><span>{t.projects}</span></p>
+          <h1>{t.projects}</h1>
+          <p className="lede">{t.projectsLede}</p>
+        </div>
+      </header>
+      <div className="frame page-pad">
+        {items == null ? (
+          <p className="note" lang={reading.lang}>{t.loading}</p>
+        ) : items.length === 0 ? (
+          <p className="note" lang={reading.lang}>{t.projectsEmpty}</p>
+        ) : (
+          <div className="project-list">
+            {items.map((item) => (
+              <article className="project-card" key={item.id}>
+                <h2>{item.title}</h2>
+                <p>{item.description}</p>
+              </article>
+            ))}
+          </div>
+        )}
+      </div>
+    </article>
+  );
+}
+
 export function Services() {
   usePage("Research & Academic Services", "Research design, quantitative analysis, publication support, electoral data research and academic consultancy by Dr. Adil Zaman.");
   return (

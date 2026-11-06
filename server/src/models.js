@@ -99,8 +99,33 @@ const pageviewSchema = new mongoose.Schema({
 });
 pageviewSchema.index({ path: 1, day: 1 }, { unique: true });
 
+const commentSchema = new mongoose.Schema({
+  articleSlug: { type: String, required: true, maxlength: 120 },
+  articleKind: { type: String, enum: ["review", "opinion"], required: true },
+  name: { type: String, required: true, maxlength: 120 },
+  email: { type: String, default: "", maxlength: 180 },
+  body: { type: String, required: true, maxlength: 2000 },
+  ipHash: { type: String, default: "", maxlength: 64 },
+  createdAt: { type: Date, default: Date.now },
+});
+commentSchema.index({ articleSlug: 1, articleKind: 1, createdAt: -1 });
+commentSchema.index({ createdAt: -1 });
+
+const projectSchema = new mongoose.Schema(
+  {
+    title: { type: String, required: true, maxlength: 200 },
+    description: { type: String, required: true, maxlength: 5000 },
+    sortOrder: { type: Number, default: 0 },
+    published: { type: Boolean, default: true },
+  },
+  { timestamps: true }
+);
+projectSchema.index({ published: 1, sortOrder: 1, updatedAt: -1 });
+
 export const Publication = mongoose.model("Publication", publicationSchema);
 export const Article = mongoose.model("Article", articleSchema);
 export const Message = mongoose.model("Message", messageSchema);
 export const User = mongoose.model("User", userSchema);
 export const Pageview = mongoose.model("Pageview", pageviewSchema);
+export const Comment = mongoose.model("Comment", commentSchema);
+export const Project = mongoose.model("Project", projectSchema);

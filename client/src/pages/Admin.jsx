@@ -175,7 +175,9 @@ function Shell() {
         <nav className="desk-nav" aria-label="Desk" onClick={() => setMenuOpen(false)}>
           <NavLink to="/admin" end>Overview</NavLink>
           <NavLink to="/admin/publications">Publications</NavLink>
+          <NavLink to="/admin/projects">Current Projects</NavLink>
           <NavLink to="/admin/articles">Writing</NavLink>
+          <NavLink to="/admin/comments">Comments</NavLink>
           <NavLink to="/admin/messages">
             Messages {unread > 0 && <em className="nav-count">{unread}</em>}
           </NavLink>
@@ -296,8 +298,10 @@ function Dashboard() {
   if (!data) return <p className="note">Opening the desk…</p>;
   const cards = [
     ["/admin/publications", "Publications", data.publications],
+    ["/admin/projects", "Current projects", data.projects],
     ["/admin/articles", "Research reviews", data.reviews],
     ["/admin/articles", "Opinion and blogs", data.opinions],
+    ["/admin/comments", "Comments", data.comments],
     ["/admin/messages", "Unread messages", data.unread],
   ];
   return (
@@ -675,6 +679,153 @@ function ArticlesAdmin() {
   );
 }
 
+const blankProject = { title: "", description: "", sortOrder: 0, published: true };
+
+function ProjectsAdmin() {
+  const [items, setItems] = useState([]);
+  const [draft, setDraft] = useState(null);
+  const [error, setError] = useState("");
+  const [busy, setBusy] = useState(false);
+  const { formRef, noticeRef, markOpened } = useFormAnchor(error);
+
+  function load() { api("/api/admin/projects").then(setItems); }
+  useEffect(load, []);
+
+  function field(name) {
+    return (event) => {
+      const value = event.target.type === "checkbox" ? event.target.checked : event.target.value;
+      setDraft((current) => ({ ...current, [name]: value }));
+    };
+  }
+
+  async function save(event) {
+    event.preventDefault();
+    if (busy) return;
+    setError("");
+    setBusy(true);
+    const body = clean({
+      ...draft,
+      sortOrder: Number(draft.sortOrder) || 0,
+    });
+    try {
+      if (draft._id) await api(`/api/admin/projects/${draft._id}`, { method: "PUT", body });
+      else await api("/api/admin/projects", { method: "POST", body });
+      setDraft(null);
+      load();
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  async function remove(id) {
+    if (!window.confirm("Delete this project?")) return;
+    await api(`/api/admin/projects/${id}`, { method: "DELETE" });
+    if (draft?._id === id) setDraft(null);
+    load();
+  }
+
+  return (
+    <>
+      <header className="desk-head split">
+        <div>
+          <p className="kicker">Archive</p>
+          <h1>Current Projects</h1>
+          <p>Each project needs a title and a short description. Published items appear after Publications on the public site.</p>
+        </div>
+        <button className="btn solid" type="button" onClick={() => { setDraft({ ...blankProject }); markOpened(); }}>New project</button>
+      </header>
+      {draft && (
+        <form className="admin-form desk-panel" ref={formRef} onSubmit={save}>
+          {error && <p className="notice error" role="alert" tabIndex={-1} ref={noticeRef}>{error}</p>}
+          <div className="fields">
+            <label className="field full">Title<input value={draft.title} onChange={field("title")} required maxLength={200} /></label>
+            <label className="field full">Description<textarea value={draft.description} onChange={field("description")} required rows={6} maxLength={5000} /></label>
+            <label className="field">Sort order<input type="number" min={0} value={draft.sortOrder} onChange={field("sortOrder")} /></label>
+            <label className="check"><input type="checkbox" checked={Boolean(draft.published)} onChange={field("published")} /> Published</label>
+          </div>
+          <div className="actions">
+            <button className="btn solid" type="submit" disabled={busy}>{busy ? "Saving…" : "Save project"}</button>
+            <button className="btn line" type="button" onClick={() => setDraft(null)}>Cancel</button>
+          </div>
+        </form>
+      )}
+      <div className="table-wrap desk-panel">
+        <table>
+          <thead><tr><th>Title</th><th>Description</th><th>Order</th><th /></tr></thead>
+          <tbody>
+            {items.map((item) => (
+              <tr key={item._id}>
+                <td data-label="Title">{item.title} {item.published === false && <span className="badge warn">Draft</span>}</td>
+                <td data-label="Description">{String(item.description || "").slice(0, 140)}{String(item.description || "").length > 140 ? "…" : ""}</td>
+                <td className="col-fit" data-label="Order">{item.sortOrder || 0}</td>
+                <td className="col-fit actions" data-label="Actions">
+                  <button type="button" onClick={() => { setDraft({ ...item }); markOpened(); }}>Edit</button>
+                  <button type="button" onClick={() => remove(item._id)}>Delete</button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+        {items.length === 0 && <p className="note">No projects yet. Add the first title and description.</p>}
+      </div>
+    </>
+  );
+}
+
+function CommentsAdmin() {
+  const [items, setItems] = useState([]);
+  function load() { api("/api/admin/comments").then(setItems); }
+  useEffect(load, []);
+
+  async function remove(id) {
+    if (!window.confirm("Delete this comment?")) return;
+    await api(`/api/admin/comments/${id}`, { method: "DELETE" });
+    load();
+  }
+
+  return (
+    <>
+      <header className="desk-head">
+        <p className="kicker">Writing</p>
+        <h1>Comments</h1>
+        <p>Public comments posted on research reviews and opinion pieces. Remove any that should not remain on the site.</p>
+      </header>
+      <div className="table-wrap desk-panel">
+        <table>
+          <thead><tr><th>Date</th><th>From</th><th>On</th><th>Comment</th><th /></tr></thead>
+          <tbody>
+            {items.map((item) => {
+              const href = item.articleKind === "review"
+                ? `/research-reviews/${item.articleSlug}`
+                : `/opinion-blogs/${item.articleSlug}`;
+              return (
+                <tr key={item._id}>
+                  <td className="col-fit" data-label="Date">{String(item.createdAt).slice(0, 10)}</td>
+                  <td data-label="From">
+                    <strong>{item.name}</strong>
+                    {item.email ? <><br /><a href={`mailto:${item.email}`}>{item.email}</a></> : null}
+                  </td>
+                  <td data-label="On">
+                    {safeHref(href) ? <Link to={safeHref(href)}>{item.articleSlug}</Link> : item.articleSlug}
+                    <br /><span className="note">{item.articleKind === "review" ? "Review" : "Opinion"}</span>
+                  </td>
+                  <td data-label="Comment">{item.body}</td>
+                  <td className="col-fit actions" data-label="Actions">
+                    <button type="button" onClick={() => remove(item._id)}>Delete</button>
+                  </td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
+        {items.length === 0 && <p className="note">No comments yet.</p>}
+      </div>
+    </>
+  );
+}
+
 function Messages() {
   const [items, setItems] = useState([]);
   const [openId, setOpenId] = useState(null);
@@ -795,7 +946,9 @@ export default function Admin() {
       <Route element={<Guard />}>
         <Route index element={<Dashboard />} />
         <Route path="publications" element={<PublicationsAdmin />} />
+        <Route path="projects" element={<ProjectsAdmin />} />
         <Route path="articles" element={<ArticlesAdmin />} />
+        <Route path="comments" element={<CommentsAdmin />} />
         <Route path="messages" element={<Messages />} />
         <Route path="password" element={<Password />} />
       </Route>

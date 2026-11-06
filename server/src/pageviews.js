@@ -4,6 +4,7 @@ const TRACKABLE = [
   /^\/expertise$/,
   /^\/publications$/,
   /^\/publications\/[\p{L}\p{N}-]{1,120}$/u,
+  /^\/current-projects$/,
   /^\/research-reviews$/,
   /^\/research-reviews\/[\p{L}\p{N}-]{1,120}$/u,
   /^\/opinion-blogs$/,

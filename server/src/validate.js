@@ -1,5 +1,5 @@
 import { ARTICLE_KINDS, ARTICLE_LANGS, PUBLICATION_TYPES } from "../../shared/catalog.js";
-import { bareDoi, httpUrl, safeHref } from "../../shared/links.js";
+import { bareDoi, httpUrl, isSlug, safeHref } from "../../shared/links.js";
 
 export function slugify(value) {
   return String(value || "")
@@ -338,6 +338,64 @@ export function articleFrom(body, { partial = false } = {}) {
   if (!partial && value.author === "") value.author = "Dr. Adil Zaman";
   if (!Object.keys(value).length) return fail("There is nothing to update.");
   return { value };
+}
+
+export function projectFrom(body, { partial = false } = {}) {
+  const invalid = guardBody(body);
+  if (invalid) return invalid;
+  const value = {};
+  const present = (key) => Object.prototype.hasOwnProperty.call(body, key);
+
+  if (!partial || present("title")) {
+    const error = assign(value, "title", text(body.title, 200, { required: true, label: "The title" }));
+    if (error) return fail(error);
+  }
+  if (!partial || present("description")) {
+    const error = assign(value, "description", text(body.description, 5000, { required: true, label: "The description" }));
+    if (error) return fail(error);
+  }
+  if (!partial || present("sortOrder")) {
+    const raw = body.sortOrder == null || body.sortOrder === "" ? 0 : body.sortOrder;
+    const number = typeof raw === "number" ? raw : typeof raw === "string" && /^-?\d+$/.test(raw.trim()) ? Number(raw) : NaN;
+    if (!Number.isInteger(number) || number < 0 || number > 100000) return fail("Sort order must be a whole number.");
+    value.sortOrder = number;
+  }
+  if (!partial || present("published")) {
+    const error = assign(value, "published", body.published == null ? { value: true } : bool(body.published, "Published"));
+    if (error) return fail(error);
+  } else if (!partial) {
+    value.published = true;
+  }
+  if (!Object.keys(value).length) return fail("There is nothing to update.");
+  return { value };
+}
+
+export function commentFrom(body) {
+  const invalid = guardBody(body);
+  if (invalid) return invalid;
+  const name = text(body.name, 120, { required: true, label: "Your name" });
+  if (name.error) return name;
+  const emailRaw = body.email == null || body.email === "" ? { value: "" } : text(body.email, 180, { label: "Email" });
+  if (emailRaw.error) return emailRaw;
+  if (emailRaw.value && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailRaw.value)) {
+    return fail("Enter a valid email address, or leave it blank.");
+  }
+  const comment = text(body.body, 2000, { required: true, label: "The comment" });
+  if (comment.error) return comment;
+  if (typeof body.kind !== "string" || !ARTICLE_KINDS.includes(body.kind)) {
+    return fail("Unknown article kind.");
+  }
+  const slug = typeof body.slug === "string" ? body.slug.trim() : "";
+  if (!isSlug(slug)) return fail("That article could not be found.");
+  return {
+    value: {
+      name: name.value,
+      email: emailRaw.value,
+      body: comment.value,
+      articleKind: body.kind,
+      articleSlug: slug,
+    },
+  };
 }
 
 export function objectId(value) {

@@ -1,4 +1,4 @@
-import { Article, Publication } from "./models.js";
+import { Article, Project, Publication } from "./models.js";
 import { presentArticle, presentPublication } from "./present.js";
 import { areas, expertise, homeServices, interests, nav, services } from "../../client/src/content.js";
 import {
@@ -171,6 +171,7 @@ export async function resolveDocument(urlPath) {
 
   if (path === "/") return homeDocument();
   if (path === "/publications") return publicationsDocument();
+  if (path === "/current-projects") return projectsDocument();
   if (path === "/research-reviews") return archiveDocument("review");
   if (path === "/opinion-blogs") return archiveDocument("opinion");
 
@@ -200,34 +201,44 @@ export async function resolveDocument(urlPath) {
 
 async function homeDocument() {
   const page = PAGES["/"];
-  const [featured, reviews, opinions] = await Promise.all([
+  const [featured, reviews, opinions, projects] = await Promise.all([
     Publication.find({ featured: true }).sort({ year: -1 }),
     Article.find({ kind: "review", published: true }).sort({ date: -1 }).limit(3),
     Article.find({ kind: "opinion", published: true }).sort({ date: -1 }).limit(3),
+    Project.find({ published: true }).sort({ sortOrder: 1, updatedAt: -1 }).limit(4),
   ]);
   const data = {
     path: "/",
     featured: featured.map(presentPublication),
     reviews: reviews.map((item) => presentArticle(item)),
     opinions: opinions.map((item) => presentArticle(item)),
+    projects: projects.map((item) => ({
+      id: String(item._id),
+      title: item.title,
+      description: item.description,
+      sortOrder: item.sortOrder || 0,
+    })),
   };
   const main = [
     `<h1>${escapeHtml(PROFILE.name)}</h1>`,
     `<p>${escapeHtml("Dr. Adil Zaman is a Political Scientist and Researcher at the University of Gujrat. He researches elections, political behaviour, democratic institutions and the changing politics of Pakistan and South Asia.")}</p>`,
     `<p>${escapeHtml("His work is empirical political research: survey analysis and comparative study of electoral processes, citizen behaviour and democratic institutions.")}</p>`,
     ...ABOUT.map((paragraph) => `<p>${escapeHtml(paragraph)}</p>`),
+    `<h2>Opinion and blogs</h2>`,
+    linkList(data.opinions.map((item) => [`/opinion-blogs/${item.slug}`, item.title])),
+    `<p><a href="/opinion-blogs">Opinion and blogs</a></p>`,
     `<h2>Research areas</h2>`,
     ...areas.map(([title, text]) => `<h3>${escapeHtml(title)}</h3><p>${escapeHtml(text)}</p>`),
     `<p><a href="/expertise">Research expertise</a></p>`,
     `<h2>Featured research</h2>`,
     linkList(data.featured.map((item) => [`/publications/${item.id}`, item.title])),
     `<p><a href="/publications">Publications</a></p>`,
+    `<h2>Current projects</h2>`,
+    ...data.projects.map((item) => `<h3>${escapeHtml(item.title)}</h3><p>${escapeHtml(item.description)}</p>`),
+    `<p><a href="/current-projects">Current projects</a></p>`,
     `<h2>Research reviews</h2>`,
     linkList(data.reviews.map((item) => [`/research-reviews/${item.slug}`, item.title])),
     `<p><a href="/research-reviews">Research reviews</a></p>`,
-    `<h2>Opinion and blogs</h2>`,
-    linkList(data.opinions.map((item) => [`/opinion-blogs/${item.slug}`, item.title])),
-    `<p><a href="/opinion-blogs">Opinion and blogs</a></p>`,
     `<h2>Research and academic services</h2>`,
     ...homeServices.map(([title, href, text]) => `<h3><a href="${escapeHtml(href)}">${escapeHtml(title)}</a></h3><p>${escapeHtml(text)}</p>`),
     `<p>${escapeHtml(`Research interests include ${interests.join(", ")}.`)}</p>`,
@@ -242,6 +253,27 @@ async function homeDocument() {
       { as: "image", href: "/media/bg-chamber.jpg", fetchpriority: "high" },
       { as: "image", href: "/media/portrait.jpg", fetchpriority: "high" },
     ],
+  });
+}
+
+async function projectsDocument() {
+  const page = PAGES["/current-projects"];
+  const items = await Project.find({ published: true }).sort({ sortOrder: 1, updatedAt: -1 }).limit(500);
+  const presented = items.map((item) => ({
+    id: String(item._id),
+    title: item.title,
+    description: item.description,
+    sortOrder: item.sortOrder || 0,
+  }));
+  const main = [
+    `<h1>${escapeHtml(page.title)}</h1>`,
+    `<p>${escapeHtml(page.description)}</p>`,
+    ...presented.map((item) => `<h2>${escapeHtml(item.title)}</h2><p>${escapeHtml(item.description)}</p>`),
+  ].join("");
+  return ready({
+    meta: { ...page, path: "/current-projects" },
+    bootstrap: { path: "/current-projects", items: presented },
+    noscript: shell(main),
   });
 }
 
@@ -530,10 +562,11 @@ export function robotsTxt() {
 export function llmsTxt() {
   const pages = [
     ["About", "/about"],
+    ["Opinion and Blogs", "/opinion-blogs"],
     ["Research Expertise", "/expertise"],
     ["Publications", "/publications"],
+    ["Current Projects", "/current-projects"],
     ["Research Reviews", "/research-reviews"],
-    ["Opinion and Blogs", "/opinion-blogs"],
     ["Services", "/services"],
     ["Contact", "/contact"],
     ["Privacy Notice", "/privacy"],

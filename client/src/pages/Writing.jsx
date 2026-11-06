@@ -4,8 +4,10 @@ import { api, formatDate } from "../api";
 import { bareDoi, doiUrl, safeHref } from "../../../shared/links.js";
 import { usePage } from "../components/Chrome";
 import { StoryCard } from "../components/Cards";
+import { Comments } from "../components/Comments";
 import { LanguageMenu } from "../components/LanguageMenu";
 import { ReadingBar } from "../components/ReadingBar";
+import { ShareLinks } from "../components/ShareLinks";
 import { contentLanguages } from "../../../shared/seo.js";
 import { articleNode, breadcrumbNode, itemListNode, readBootstrap } from "../seo";
 import { categoryLabel, dirFor, readingMinutes, selectEdition, textLang } from "../../../shared/reading.js";
@@ -254,6 +256,8 @@ export function ArticlePage({ kind }) {
               </section>
             ))}
           </div>
+          <ShareLinks path={`${base}/${article.slug}`} title={edition.title} />
+          <Comments slug={article.slug} kind={kind} />
           </div>
           {hasSide && (
             <aside className="essay-side">

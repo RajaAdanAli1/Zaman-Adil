@@ -55,6 +55,11 @@ export const PAGES = {
     description:
       "Academic publications by Dr. Adil Zaman on elections, political behaviour, democratic institutions, Pakistan politics and South Asian politics.",
   },
+  "/current-projects": {
+    title: "Current Projects",
+    description:
+      "Current research and academic projects by Dr. Adil Zaman on elections, political behaviour, democratic institutions and South Asian politics.",
+  },
   "/research-reviews": {
     title: "Research Reviews",
     description:

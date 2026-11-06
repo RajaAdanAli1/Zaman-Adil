@@ -13,6 +13,7 @@ const ArticlePage = lazy(() => loadWriting().then((mod) => ({ default: mod.Artic
 const loadPages = () => import("./pages/Pages");
 const About = lazy(() => loadPages().then((mod) => ({ default: mod.About })));
 const Expertise = lazy(() => loadPages().then((mod) => ({ default: mod.Expertise })));
+const Projects = lazy(() => loadPages().then((mod) => ({ default: mod.Projects })));
 const Services = lazy(() => loadPages().then((mod) => ({ default: mod.Services })));
 const Contact = lazy(() => loadPages().then((mod) => ({ default: mod.Contact })));
 const SearchPage = lazy(() => loadPages().then((mod) => ({ default: mod.SearchPage })));
@@ -36,6 +37,7 @@ export default function App() {
               <Route path="expertise" element={<Expertise />} />
               <Route path="publications" element={<Publications />} />
               <Route path="publications/:slug" element={<PublicationPage />} />
+              <Route path="current-projects" element={<Projects />} />
               <Route path="research-reviews" element={<Archive kind="review" />} />
               <Route path="research-reviews/:slug" element={<ArticlePage kind="review" />} />
               <Route path="opinion-blogs" element={<Archive kind="opinion" />} />

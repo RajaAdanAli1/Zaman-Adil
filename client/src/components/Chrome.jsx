@@ -251,7 +251,7 @@ function SiteChrome({ children }) {
           <div>
             <h2>Explore</h2>
             <ul>
-              {nav.slice(1, 6).map(([href, label]) => {
+              {nav.slice(1, 7).map(([href, label]) => {
                 const text = navLabel(href, label, reading.lang, reading.t);
                 return (
                   <li key={href}><Link to={href} lang={text !== label ? reading.lang : undefined}>{text}</Link></li>

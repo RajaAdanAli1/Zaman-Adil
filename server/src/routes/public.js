@@ -1,6 +1,6 @@
 import { Router } from "express";
 import { enquiries } from "../../../client/src/content.js";
-import { Article, Publication, Message, Pageview } from "../models.js";
+import { Article, Comment, Publication, Message, Pageview, Project } from "../models.js";
 import { canonicalLink } from "../seed.js";
 import { toBibtex } from "../bibtex.js";
 import { presentAlt, presentArticle, presentPublication } from "../present.js";
@@ -11,15 +11,38 @@ import { sendContactEmail } from "../mail.js";
 import { ARTICLE_KINDS } from "../../../shared/catalog.js";
 import { isSlug } from "../../../shared/links.js";
 import { translateTexts, translationRequest } from "../translate.js";
+import { commentFrom } from "../validate.js";
 
 const router = Router();
 const CONTACT_LIMIT = 5;
 const CONTACT_WINDOW = 10 * 60 * 1000;
+const COMMENT_LIMIT = 8;
+const COMMENT_WINDOW = 10 * 60 * 1000;
 const TRACK_LIMIT = 60;
 const TRACK_WINDOW = 60 * 1000;
 const TRANSLATE_LIMIT = 60;
 const TRANSLATE_WINDOW = 10 * 60 * 1000;
 const LIST_LIMIT = 500;
+
+function presentComment(doc) {
+  const item = doc.toObject ? doc.toObject() : doc;
+  return {
+    id: String(item._id),
+    name: item.name,
+    body: item.body,
+    createdAt: item.createdAt,
+  };
+}
+
+function presentProject(doc) {
+  const item = doc.toObject ? doc.toObject() : doc;
+  return {
+    id: String(item._id),
+    title: item.title,
+    description: item.description,
+    sortOrder: item.sortOrder || 0,
+  };
+}
 
 const CONSENT = new Set(["1", "true", "on", "yes"]);
 
@@ -33,16 +56,67 @@ function bounded(value, max, { required = false } = {}) {
 
 router.get("/home", async (_req, res, next) => {
   try {
-    const [featured, reviews, opinions] = await Promise.all([
+    const [featured, reviews, opinions, projects] = await Promise.all([
       Publication.find({ featured: true }).sort({ year: -1, title: 1 }).limit(12),
       Article.find({ kind: "review", published: true }).sort({ date: -1 }).limit(3),
       Article.find({ kind: "opinion", published: true }).sort({ date: -1 }).limit(3),
+      Project.find({ published: true }).sort({ sortOrder: 1, updatedAt: -1 }).limit(4),
     ]);
     res.json({
       featured: featured.map(presentPublication),
       reviews: reviews.map((item) => presentArticle(item)),
       opinions: opinions.map((item) => presentArticle(item)),
+      projects: projects.map(presentProject),
     });
+  } catch (error) {
+    next(error);
+  }
+});
+
+router.get("/projects", async (_req, res, next) => {
+  try {
+    const items = await Project.find({ published: true }).sort({ sortOrder: 1, updatedAt: -1 }).limit(LIST_LIMIT);
+    res.json({ items: items.map(presentProject) });
+  } catch (error) {
+    next(error);
+  }
+});
+
+router.get("/comments", async (req, res, next) => {
+  try {
+    const kind = typeof req.query.kind === "string" ? req.query.kind : "";
+    const slug = typeof req.query.slug === "string" ? req.query.slug : "";
+    if (!ARTICLE_KINDS.includes(kind) || !isSlug(slug)) {
+      return res.status(400).json({ error: "That article could not be found." });
+    }
+    const items = await Comment.find({ articleKind: kind, articleSlug: slug }).sort({ createdAt: -1 }).limit(200);
+    res.json({ items: items.map(presentComment) });
+  } catch (error) {
+    next(error);
+  }
+});
+
+router.post("/comments", async (req, res, next) => {
+  try {
+    const body = req.body;
+    if (body?.website != null && String(body.website).trim() !== "") return res.json({ ok: true });
+    const parsed = commentFrom(body);
+    if (parsed.error) return res.status(400).json({ error: parsed.error });
+    const article = await Article.findOne({
+      slug: parsed.value.articleSlug,
+      kind: parsed.value.articleKind,
+      published: true,
+    }).select("_id");
+    if (!article) return res.status(404).json({ error: "That article could not be found." });
+    const ipHash = hashAddress(clientAddress(req));
+    const status = limitStatus(`comment:${ipHash}`, { limit: COMMENT_LIMIT, windowMs: COMMENT_WINDOW });
+    if (status.limited) {
+      res.setHeader("Retry-After", String(status.retryAfter));
+      return res.status(429).json({ error: "Please wait a few minutes before posting another comment." });
+    }
+    recordLimit(`comment:${ipHash}`, { windowMs: COMMENT_WINDOW });
+    const saved = await Comment.create({ ...parsed.value, ipHash });
+    res.status(201).json({ ok: true, item: presentComment(saved) });
   } catch (error) {
     next(error);
   }
@@ -189,10 +263,11 @@ router.get("/search", async (req, res, next) => {
     ]);
     const pages = [
       ["About", "/about", "Profile of Dr. Adil Zaman"],
+      ["Opinion & Blogs", "/opinion-blogs", "Evidence-informed commentary"],
       ["Research Expertise", "/expertise", "Elections, political behaviour, Pakistan and South Asia"],
       ["Publications", "/publications", "Journal articles and scholarly work"],
+      ["Current Projects", "/current-projects", "Active research and academic projects"],
       ["Research Reviews", "/research-reviews", "Reviews of academic studies"],
-      ["Opinion & Blogs", "/opinion-blogs", "Evidence-informed commentary"],
       ["Services", "/services", "Research design, analysis and consultancy"],
       ["Contact", "/contact", "Academic and professional enquiries"],
     ]
