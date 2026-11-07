@@ -513,7 +513,9 @@ export function applyTemplate(template, document) {
   const head = headBlock({ ...document.meta, lang: document.lang });
   const bootstrap = jsonScript(document.bootstrap || {});
   const fallback = document.noscript ? `<div class="server-fallback">${document.noscript}</div>` : "";
-  let html = template.replace(/<html lang="[^"]*">/i, `<html lang="${document.lang === "ur" ? "ur" : "en"}">`);
+  const docLang = document.lang === "ur" ? "ur" : "en";
+    const docDir = docLang === "ur" ? "rtl" : "ltr";
+    let html = template.replace(/<html lang="[^"]*">/i, `<html lang="${docLang}" dir="${docDir}">`);
   if (html.includes("<!--seo-head-->") && html.includes("<!--/seo-head-->")) {
     html = html.replace(/<!--seo-head-->[\s\S]*?<!--\/seo-head-->/, `<!--seo-head-->\n    ${head}\n    <!--/seo-head-->`);
   }
