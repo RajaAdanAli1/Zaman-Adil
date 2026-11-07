@@ -1,4 +1,4 @@
-import { readingCode } from "../../shared/reading.js";
+import { dirFor, readingCode } from "../../shared/reading.js";
 import {
   ORIGIN,
   PROFILE,
@@ -67,6 +67,7 @@ export function applyHead({ title, description, path, robots, image, imageAlt, l
   const pageLang = lang === "ur" ? "ur" : "en";
   document.title = branded;
   document.documentElement.lang = readingCode(lang);
+  document.documentElement.dir = dirFor(pageLang);
   upsertMeta("name", "description", summary);
   upsertMeta("name", "author", PROFILE.name);
   upsertMeta("name", "robots", robots || robotsFor(path || "/"));
