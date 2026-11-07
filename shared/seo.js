@@ -41,7 +41,7 @@ export const PAGES = {
     description: PROFILE.description,
   },
   "/about": {
-    title: "About",
+    title: "About Dr. Adil Zaman | Political Scientist & Researcher",
     description:
       "Dr. Adil Zaman is a political scientist, researcher and academic specialising in elections, political behaviour, democratic institutions and South Asian politics.",
   },
@@ -51,7 +51,7 @@ export const PAGES = {
       "Research expertise in elections, voting behaviour, political participation, Pakistan politics, South Asia, parliament and quantitative political research.",
   },
   "/publications": {
-    title: "Publications",
+    title: "Publications by Dr. Adil Zaman | Political Science Research",
     description:
       "Academic publications by Dr. Adil Zaman on elections, political behaviour, democratic institutions, Pakistan politics and South Asian politics.",
   },
@@ -76,7 +76,7 @@ export const PAGES = {
       "Research design, quantitative analysis, publication support, electoral data research and academic consultancy by Dr. Adil Zaman.",
   },
   "/contact": {
-    title: "Contact",
+    title: "Contact Dr. Adil Zaman | Research & Academic Enquiries",
     description:
       "Contact Dr. Adil Zaman about academic collaboration, research consultancy, invited lectures, research projects and publication enquiries.",
   },
