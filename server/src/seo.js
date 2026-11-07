@@ -1,5 +1,6 @@
 import { Article, Project, Publication } from "./models.js";
 import { presentArticle, presentPublication } from "./present.js";
+import { ISSUED as LEGAL_ISSUED, PROPRIETOR as LEGAL_PROPRIETOR, instruments as legalInstruments } from "../../client/src/legalDocuments.js";
 import { areas, expertise, homeServices, interests, nav, services } from "../../client/src/content.js";
 import {
   ORIGIN,
@@ -100,6 +101,67 @@ function linkList(items) {
   return `<ul>${items.map(([href, text]) => `<li><a href="${escapeHtml(href)}">${escapeHtml(text)}</a></li>`).join("")}</ul>`;
 }
 
+function linkedText(text) {
+    return String(text)
+      .split(/(https:\/\/[^\s)]+|adil\.zaman@uog\.edu\.pk)/g)
+      .map((part) => {
+              if (!part) return "";
+              if (part.startsWith("https://")) {
+                        const clean = part.replace(/[.,;:]$/, "");
+                        const tail = part.slice(clean.length);
+                        return `<a href="${escapeHtml(clean)}">${escapeHtml(clean)}</a>${escapeHtml(tail)}`;
+              }
+              if (part.includes("@")) return `<a href="mailto:${escapeHtml(part)}">${escapeHtml(part)}</a>`;
+              return escapeHtml(part);
+      })
+      .join("");
+}
+
+function legalDocument(kind) {
+    const doc = legalInstruments[kind];
+    const page = PAGES[`/${kind}`];
+    const path = `/${kind}`;
+    const others = [
+          ["/privacy", "Privacy Notice"],
+          ["/disclaimer", "Academic and Editorial Disclaimer"],
+          ["/accessibility", "Accessibility Statement"],
+        ].filter(([href]) => href !== path);
+    const sections = doc.sections
+      .map((section, sectionIndex) => {
+              const article = sectionIndex + 1;
+              const clauses = section.clauses
+                .map((clause, clauseIndex) => {
+                            const body = typeof clause === "string" ? { text: clause } : clause;
+                            const number = `${article}.${clauseIndex + 1}`;
+                            const items = body.items
+                              ? `<ol>${body.items
+                                                       .map((item, itemIndex) => `<li>(${String.fromCharCode(97 + itemIndex)}) ${linkedText(item)}</li>`)
+                                                       .join("")}</ol>`
+                                          : "";
+                            return `<li id="c-${number}"><strong>${number}</strong> ${linkedText(body.text)}${items}</li>`;
+                })
+                .join("");
+              return `<section aria-labelledby="art-${article}"><h2 id="art-${article}">${article}. ${escapeHtml(section.heading)}</h2><ol>${clauses}</ol></section>`;
+      })
+      .join("");
+    const main = [
+          `<h1>${escapeHtml(doc.title)}</h1>`,
+          `<p>${escapeHtml(doc.description)}</p>`,
+          `<p>Document ${escapeHtml(doc.ref)} &middot; Version ${escapeHtml(doc.version)} &middot; Issued ${escapeHtml(LEGAL_ISSUED)} &middot; ${escapeHtml(doc.standing)}</p>`,
+          `<p><a href="${escapeHtml(doc.file)}">Download PDF</a> — a copy for printing and filing; if this page and the PDF differ, this page is the text in force.</p>`,
+          doc.preamble.map((paragraph) => `<p>${linkedText(paragraph)}</p>`).join(""),
+          sections,
+          `<h2>Attestation</h2>`,
+          `<p>${escapeHtml(LEGAL_PROPRIETOR.name)}, ${escapeHtml(LEGAL_PROPRIETOR.role)}</p>`,
+          `<p>Proprietor of ${escapeHtml(LEGAL_PROPRIETOR.site)}</p>`,
+          `<p>Attested on ${escapeHtml(LEGAL_ISSUED)} in a personal professional capacity. This instrument is not a seal or a decision of the ${escapeHtml(LEGAL_PROPRIETOR.institution)}.</p>`,
+          `<p>End of document ${escapeHtml(doc.ref)}.</p>`,
+          `<h2>Related instruments</h2>`,
+          linkList(others),
+        ].join("");
+    return ready({ meta: { ...page, path }, bootstrap: { path }, noscript: shell(main) });
+}
+
 function notFound(path) {
   const page = {
     title: "Page not found",
@@ -184,8 +246,11 @@ export async function resolveDocument(urlPath) {
   const opinion = path.match(/^\/opinion-blogs\/([^/]+)$/);
   if (opinion) return articleDocument(opinion[1], "opinion");
 
-  if (path === "/terms") {
-    const document = staticDocument("/disclaimer");
+if (path === "/privacy" || path === "/disclaimer" || path === "/accessibility") {
+      return legalDocument(path.slice(1));
+}
+    if (path === "/terms") {
+    const document = legalDocument("disclaimer");
     document.meta = {
       ...document.meta,
       title: "Terms",
