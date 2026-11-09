@@ -118,6 +118,16 @@ export function createApp() {
     }
   });
 
+  // Keep one indexed URL for the disclaimer; /terms remains as a permanent redirect.
+  app.get(["/terms", "/terms/"], (_req, res) => {
+    res.redirect(301, "/disclaimer");
+  });
+
+  // Bots request these by convention; the HTML head already points at /media/logo.jpg.
+  app.get(["/favicon.ico", "/apple-touch-icon.png", "/apple-touch-icon-precomposed.png"], (_req, res) => {
+    res.redirect(301, "/media/logo.jpg");
+  });
+
   if (fs.existsSync(clientIndex)) {
     const production = process.env.NODE_ENV === "production";
     let templateCache = { mtime: 0, html: "" };
@@ -160,7 +170,9 @@ export function createApp() {
         if (!markdownPath && path.extname(req.path)) return res.status(404).end();
         const template = readTemplate();
         const document = await resolveDocument(pagePath);
-        if (document.robotsHeader) res.setHeader("X-Robots-Tag", document.robotsHeader);
+        // .md URLs are agent convenience copies; keep the HTML path as the indexed URL.
+        if (markdownPath) res.setHeader("X-Robots-Tag", "noindex, follow");
+        else if (document.robotsHeader) res.setHeader("X-Robots-Tag", document.robotsHeader);
         res.setHeader("Cache-Control", "no-cache");
         res.setHeader("Vary", "Accept");
         res.setHeader("Link", agentLinkHeader(pagePath));

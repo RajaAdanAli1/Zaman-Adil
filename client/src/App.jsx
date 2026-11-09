@@ -1,5 +1,5 @@
 import { lazy, Suspense } from "react";
-import { Route, Routes } from "react-router-dom";
+import { Navigate, Route, Routes } from "react-router-dom";
 import { Layout } from "./components/Chrome";
 import Home from "./pages/Home";
 
@@ -45,7 +45,7 @@ export default function App() {
               <Route path="services" element={<Services />} />
               <Route path="contact" element={<Contact />} />
               <Route path="search" element={<SearchPage />} />
-              <Route path="terms" element={<Legal kind="disclaimer" />} />
+              <Route path="terms" element={<Navigate to="/disclaimer" replace />} />
               <Route path="privacy" element={<Legal kind="privacy" />} />
               <Route path="disclaimer" element={<Legal kind="disclaimer" />} />
               <Route path="accessibility" element={<Legal kind="accessibility" />} />

@@ -95,10 +95,6 @@ export const PAGES = {
     description:
       "The accessibility aim for zamanadil.com, the limits that are known, and how to report a barrier.",
   },
-  "/terms": {
-    title: "Terms",
-    description: "Terms of use for zamanadil.com, set out in the academic and editorial disclaimer.",
-  },
 };
 
 export function clip(text, max = 158) {

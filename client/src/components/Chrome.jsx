@@ -272,8 +272,7 @@ function SiteChrome({ children }) {
           <p>© {new Date().getFullYear()} Dr. Adil Zaman. All rights reserved.</p>
           <nav aria-label="Legal">
             <Link to="/privacy">Privacy</Link>
-            <Link to="/terms">Terms</Link>
-            <Link to="/disclaimer">Disclaimer</Link>
+            <Link to="/disclaimer">Terms & Disclaimer</Link>
             <Link to="/accessibility">Accessibility</Link>
           </nav>
         </div>

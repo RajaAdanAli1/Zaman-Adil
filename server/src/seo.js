@@ -83,7 +83,6 @@ function shell(main) {
   const links = [
     ...nav,
     ["/privacy", "Privacy"],
-    ["/terms", "Terms"],
     ["/disclaimer", "Disclaimer"],
     ["/accessibility", "Accessibility"],
   ]
@@ -184,17 +183,7 @@ export async function resolveDocument(urlPath) {
   const opinion = path.match(/^\/opinion-blogs\/([^/]+)$/);
   if (opinion) return articleDocument(opinion[1], "opinion");
 
-  if (path === "/terms") {
-    const document = staticDocument("/disclaimer");
-    document.meta = {
-      ...document.meta,
-      title: "Terms",
-      path: "/terms",
-      canonicalPath: "/disclaimer",
-    };
-    document.bootstrap = { path: "/terms" };
-    return document;
-  }
+  if (path === "/terms") return notFound(path);
   if (PAGES[path]) return staticDocument(path);
   return notFound(path);
 }
@@ -515,7 +504,7 @@ export function sitemapIndexXml() {
 
 export function pagesSitemapXml() {
   const revised = new Date();
-  return urlset(Object.keys(PAGES).filter((path) => path !== "/terms").map((path) => ({
+  return urlset(Object.keys(PAGES).map((path) => ({
     loc: `${ORIGIN}${path === "/" ? "/" : path}`,
     updated: revised,
     images: path === "/" || path === "/about"
@@ -552,6 +541,7 @@ export function robotsTxt() {
     "Disallow: /admin",
     "Disallow: /search",
     "Disallow: /api",
+    "Disallow: /*.md$",
     "Content-Signal: search=yes, ai-input=yes, ai-train=no",
     "",
     `Sitemap: ${ORIGIN}/sitemap.xml`,
@@ -570,7 +560,6 @@ export function llmsTxt() {
     ["Services", "/services"],
     ["Contact", "/contact"],
     ["Privacy Notice", "/privacy"],
-    ["Terms", "/terms"],
     ["Academic Disclaimer", "/disclaimer"],
     ["Accessibility", "/accessibility"],
   ];
