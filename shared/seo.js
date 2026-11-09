@@ -41,7 +41,7 @@ export const PAGES = {
     description: PROFILE.description,
   },
   "/about": {
-    title: "About",
+    title: "About Dr. Adil Zaman | Political Scientist & Researcher",
     description:
       "Dr. Adil Zaman is a political scientist, researcher and academic specialising in elections, political behaviour, democratic institutions and South Asian politics.",
   },
@@ -51,7 +51,7 @@ export const PAGES = {
       "Research expertise in elections, voting behaviour, political participation, Pakistan politics, South Asia, parliament and quantitative political research.",
   },
   "/publications": {
-    title: "Publications",
+    title: "Publications by Dr. Adil Zaman | Political Science Research",
     description:
       "Academic publications by Dr. Adil Zaman on elections, political behaviour, democratic institutions, Pakistan politics and South Asian politics.",
   },
@@ -76,7 +76,7 @@ export const PAGES = {
       "Research design, quantitative analysis, publication support, electoral data research and academic consultancy by Dr. Adil Zaman.",
   },
   "/contact": {
-    title: "Contact",
+    title: "Contact Dr. Adil Zaman | Research & Academic Enquiries",
     description:
       "Contact Dr. Adil Zaman about academic collaboration, research consultancy, invited lectures, research projects and publication enquiries.",
   },
@@ -108,9 +108,9 @@ export function clip(text, max = 158) {
 export function documentTitle(title) {
   const raw = String(title || PROFILE.name).replace(/\s+/g, " ").trim();
   const branded = /Dr\.?\s+Adil/i.test(raw) ? raw : `${raw} · ${PROFILE.name}`;
-  const chosen = branded.length <= 70 ? branded : raw;
-  if (chosen.length <= 70) return chosen;
-  const cut = chosen.slice(0, 67);
+  const chosen = branded.length <= 60 ? branded : raw;
+  if (chosen.length <= 60) return chosen;
+  const cut = chosen.slice(0, 57);
   const space = cut.lastIndexOf(" ");
   return `${(space > 40 ? cut.slice(0, space) : cut).trim()}…`;
 }

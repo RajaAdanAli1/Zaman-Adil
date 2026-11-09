@@ -12,6 +12,29 @@ import { applyTemplate, documentMarkdown, llmsTxt, pagesSitemapXml, publications
 import { handleMcp, mcpServerCard } from "./mcp.js";
 import { csrfProtection, originAllowed, securityHeaders, trustProxySetting } from "./security.js";
 
+const LEGACY_SLUG_REDIRECTS = {
+    "/research-reviews/a-scientific-approach-to-measure-public-political-participation-in-pakistan":
+          "/research-reviews/measuring-political-participation-pakistan",
+    "/research-reviews/analysis-of-determinants-of-voter-turnout-in-indian-states-for-election-years-19912019":
+          "/research-reviews/voter-turnout-determinants-indian-states-1991-2019",
+    "/research-reviews/digital-citizen-empowerment-a-systematic-literature-review-of-theories-and-development-models":
+          "/research-reviews/digital-citizen-empowerment-literature-review",
+    "/research-reviews/effects-of-sociodemographic-variables-and-facebook-group-membership-on-students-political-participation":
+          "/research-reviews/facebook-group-membership-student-political-participation",
+    "/research-reviews/influence-of-political-socialization-agents-on-pakistani-youths-political-participation-the-mediating-role-of-media-and-interpersonal-communication":
+          "/research-reviews/political-socialization-youth-participation-pakistan",
+    "/research-reviews/major-structural-issues-and-measures-to-improve-political-participation-of-minorities-in-india":
+          "/research-reviews/political-participation-minorities-india",
+    "/research-reviews/media-use-and-online-political-participation-the-mediating-roles-of-media-credibility-and-political-trust-in-jakarta-and-islamabad":
+          "/research-reviews/media-use-political-participation-jakarta-islamabad",
+    "/research-reviews/patterns-of-socio-political-participation-in-nepal-and-implications-for-social-inclusion":
+          "/research-reviews/socio-political-participation-nepal-social-inclusion",
+    "/publications/parliamentary-committees-and-opposition-effectiveness-in-pakistan-the-pakistan-peoples-party-in-the-national-assembly-19":
+          "/publications/parliamentary-committees-ppp-national-assembly-1990-2018",
+    "/opinion-blogs/انتخابی-دیانت-داری-ہی-پاکستان-کے-جمہور":
+          "/opinion-blogs/electoral-integrity-pakistans-democratic-future",
+};
+
 function wantsMarkdown(req) {
   return /text\/markdown/i.test(req.get("accept") || "");
 }
@@ -39,6 +62,19 @@ export function createApp() {
     const status = req.method === "GET" || req.method === "HEAD" ? 301 : 308;
     return res.redirect(status, `${ORIGIN}${req.originalUrl}`);
   });
+
+    app.use((req, res, next) => {
+          if (req.method !== "GET" && req.method !== "HEAD") return next();
+          let decoded = req.originalUrl.split("?")[0];
+          try {
+                  decoded = decodeURIComponent(decoded);
+          } catch {
+                  decoded = req.originalUrl.split("?")[0];
+          }
+          const target = LEGACY_SLUG_REDIRECTS[decoded];
+          if (target) return res.redirect(301, target);
+          return next();
+    });
 
   app.use(securityHeaders);
   app.use((req, res, next) => {
