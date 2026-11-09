@@ -245,24 +245,10 @@ export async function resolveDocument(urlPath) {
   const opinion = path.match(/^\/opinion-blogs\/([^/]+)$/);
   if (opinion) return articleDocument(opinion[1], "opinion");
 
-<<<<<<< HEAD
-  if (path === "/terms") return notFound(path);
-=======
-if (path === "/privacy" || path === "/disclaimer" || path === "/accessibility") {
-      return legalDocument(path.slice(1));
-}
-    if (path === "/terms") {
-    const document = legalDocument("disclaimer");
-    document.meta = {
-      ...document.meta,
-      title: "Terms",
-      path: "/terms",
-      canonicalPath: "/disclaimer",
-    };
-    document.bootstrap = { path: "/terms" };
-    return document;
+  if (path === "/privacy" || path === "/disclaimer" || path === "/accessibility") {
+    return legalDocument(path.slice(1));
   }
->>>>>>> cd2bbb9fb67b21cba5225b539d54e3aecee4d877
+  if (path === "/terms") return notFound(path);
   if (PAGES[path]) return staticDocument(path);
   return notFound(path);
 }
